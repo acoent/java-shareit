@@ -1,13 +1,17 @@
 package ru.practicum.shareit.item.dto;
 
-public class ItemDto {
+import java.util.List;
+
+public class ItemResponseDto {
     private Long id;
     private String name;
     private String description;
     private Boolean available;
-    private Long requestId;
+    private BookingShortDto lastBooking;
+    private BookingShortDto nextBooking;
+    private List<CommentDto> comments;
 
-    public ItemDto() {
+    public ItemResponseDto() {
     }
 
     public Long getId() {
@@ -42,11 +46,27 @@ public class ItemDto {
         this.available = available;
     }
 
-    public Long getRequestId() {
-        return requestId;
+    public BookingShortDto getLastBooking() {
+        return lastBooking;
     }
 
-    public void setRequestId(Long requestId) {
-        this.requestId = requestId;
+    public void setLastBooking(BookingShortDto lastBooking) {
+        this.lastBooking = lastBooking;
+    }
+
+    public BookingShortDto getNextBooking() {
+        return nextBooking;
+    }
+
+    public void setNextBooking(BookingShortDto nextBooking) {
+        this.nextBooking = nextBooking;
+    }
+
+    public List<CommentDto> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentDto> comments) {
+        this.comments = comments;
     }
 }

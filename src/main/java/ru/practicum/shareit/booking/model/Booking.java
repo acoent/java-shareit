@@ -1,16 +1,16 @@
-package ru.practicum.shareit.booking.dto;
+package ru.practicum.shareit.booking.model;
 
 import java.time.LocalDateTime;
 
-public class BookingDto {
+public class Booking {
     private Long id;
     private Long itemId;
+    private Long bookerId;
     private LocalDateTime start;
     private LocalDateTime end;
-    private Long bookerId;
-    private String status;
+    private BookingStatus status;
 
-    public BookingDto() {
+    public Booking() {
     }
 
     public Long getId() {
@@ -29,6 +29,14 @@ public class BookingDto {
         this.itemId = itemId;
     }
 
+    public Long getBookerId() {
+        return bookerId;
+    }
+
+    public void setBookerId(Long bookerId) {
+        this.bookerId = bookerId;
+    }
+
     public LocalDateTime getStart() {
         return start;
     }
@@ -45,19 +53,11 @@ public class BookingDto {
         this.end = end;
     }
 
-    public Long getBookerId() {
-        return bookerId;
-    }
-
-    public void setBookerId(Long bookerId) {
-        this.bookerId = bookerId;
-    }
-
-    public String getStatus() {
+    public BookingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(BookingStatus status) {
         this.status = status;
     }
 }
