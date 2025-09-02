@@ -15,12 +15,17 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
     private final InMemoryUserRepository repo;
-    public UserServiceImpl(InMemoryUserRepository repo) { this.repo = repo; }
+
+    public UserServiceImpl(InMemoryUserRepository repo) {
+        this.repo = repo;
+    }
 
     @Override
     public UserDto create(UserDto dto) {
         validate(dto);
-        repo.findByEmail(dto.getEmail()).ifPresent(u -> { throw new ConflictException("Email already exists: " + dto.getEmail()); });
+        repo.findByEmail(dto.getEmail()).ifPresent(u -> {
+            throw new ConflictException("Email already exists: " + dto.getEmail());
+        });
         User u = UserMapper.toModel(dto);
         u.setId(null);
         User saved = repo.save(u);

@@ -11,11 +11,13 @@ import java.util.List;
 @RequestMapping("/requests")
 public class ItemRequestController {
     private final ItemRequestService service;
-    public ItemRequestController(ItemRequestService service) { this.service = service; }
+
+    public ItemRequestController(ItemRequestService service) {
+        this.service = service;
+    }
 
     @PostMapping
-    public ResponseEntity<ItemRequestDto> create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @RequestBody ItemRequestDto dto) {
+    public ResponseEntity<ItemRequestDto> create(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemRequestDto dto) {
         return ResponseEntity.ok(service.create(userId, dto));
     }
 

@@ -18,12 +18,16 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final InMemoryItemRequestRepository repo;
     private final InMemoryUserRepository userRepo;
 
-    public ItemRequestServiceImpl(InMemoryItemRequestRepository repo, InMemoryUserRepository userRepo) { this.repo = repo; this.userRepo = userRepo; }
+    public ItemRequestServiceImpl(InMemoryItemRequestRepository repo, InMemoryUserRepository userRepo) {
+        this.repo = repo;
+        this.userRepo = userRepo;
+    }
 
     @Override
     public ItemRequestDto create(Long userId, ItemRequestDto dto) {
         if (userId == null || !userRepo.existsById(userId)) throw new NotFoundException("User not found: " + userId);
-        if (dto == null || dto.getDescription() == null || dto.getDescription().isBlank()) throw new BadRequestException("Description required");
+        if (dto == null || dto.getDescription() == null || dto.getDescription().isBlank())
+            throw new BadRequestException("Description required");
         ItemRequest r = new ItemRequest();
         r.setDescription(dto.getDescription());
         r.setRequesterId(userId);

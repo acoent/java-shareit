@@ -19,7 +19,9 @@ public class InMemoryItemRepository {
         return item;
     }
 
-    public Optional<Item> findById(Long id) { return Optional.ofNullable(items.get(id)); }
+    public Optional<Item> findById(Long id) {
+        return Optional.ofNullable(items.get(id));
+    }
 
     public List<Item> findAllByOwner(Long ownerId) {
         return items.values().stream().filter(i -> i.getOwnerId().equals(ownerId)).sorted(Comparator.comparing(Item::getId)).collect(Collectors.toList());
@@ -27,13 +29,10 @@ public class InMemoryItemRepository {
 
     public List<Item> searchAvailableByText(String text) {
         String q = text.toLowerCase();
-        return items.values().stream()
-                .filter(i -> Boolean.TRUE.equals(i.getAvailable()))
-                .filter(i -> (i.getName() != null && i.getName().toLowerCase().contains(q)) ||
-                             (i.getDescription() != null && i.getDescription().toLowerCase().contains(q)))
-                .sorted(Comparator.comparing(Item::getId))
-                .collect(Collectors.toList());
+        return items.values().stream().filter(i -> Boolean.TRUE.equals(i.getAvailable())).filter(i -> (i.getName() != null && i.getName().toLowerCase().contains(q)) || (i.getDescription() != null && i.getDescription().toLowerCase().contains(q))).sorted(Comparator.comparing(Item::getId)).collect(Collectors.toList());
     }
 
-    public List<Item> findAll() { return new ArrayList<>(items.values()); }
+    public List<Item> findAll() {
+        return new ArrayList<>(items.values());
+    }
 }

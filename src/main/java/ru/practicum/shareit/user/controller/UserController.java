@@ -11,7 +11,10 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService service;
-    public UserController(UserService service) { this.service = service; }
+
+    public UserController(UserService service) {
+        this.service = service;
+    }
 
     @PostMapping
     public ResponseEntity<UserDto> create(@RequestBody UserDto dto) {
@@ -19,10 +22,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> get(@PathVariable Long id) { return ResponseEntity.ok(service.getById(id)); }
+    public ResponseEntity<UserDto> get(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
+    }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAll() { return ResponseEntity.ok(service.getAll()); }
+    public ResponseEntity<List<UserDto>> getAll() {
+        return ResponseEntity.ok(service.getAll());
+    }
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> update(@PathVariable Long id, @RequestBody UserDto dto) {

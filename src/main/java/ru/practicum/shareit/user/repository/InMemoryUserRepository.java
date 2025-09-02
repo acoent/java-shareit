@@ -18,13 +18,24 @@ public class InMemoryUserRepository {
         return user;
     }
 
-    public Optional<User> findById(Long id) { return Optional.ofNullable(users.get(id)); }
-    public void deleteById(Long id) { users.remove(id); }
-    public List<User> findAll() { return new ArrayList<>(users.values()); }
-    public boolean existsById(Long id) { return users.containsKey(id); }
+    public Optional<User> findById(Long id) {
+        return Optional.ofNullable(users.get(id));
+    }
 
-public Optional<User> findByEmail(String email) {
-    return users.values().stream().filter(u -> u.getEmail() != null && u.getEmail().equals(email)).findFirst();
-}
+    public void deleteById(Long id) {
+        users.remove(id);
+    }
+
+    public List<User> findAll() {
+        return new ArrayList<>(users.values());
+    }
+
+    public boolean existsById(Long id) {
+        return users.containsKey(id);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return users.values().stream().filter(u -> u.getEmail() != null && u.getEmail().equals(email)).findFirst();
+    }
 
 }

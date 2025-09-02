@@ -26,9 +26,7 @@ public class ItemServiceImpl implements ItemService {
     private final ConcurrentMap<Long, List<CommentDto>> comments = new ConcurrentHashMap<>();
     private final ConcurrentMap<Long, Object> locks = new ConcurrentHashMap<>();
 
-    public ItemServiceImpl(InMemoryItemRepository itemRepo,
-                           InMemoryUserRepository userRepo,
-                           InMemoryBookingRepository bookingRepo) {
+    public ItemServiceImpl(InMemoryItemRepository itemRepo, InMemoryUserRepository userRepo, InMemoryBookingRepository bookingRepo) {
         this.itemRepo = itemRepo;
         this.userRepo = userRepo;
         this.bookingRepo = bookingRepo;
@@ -62,10 +60,8 @@ public class ItemServiceImpl implements ItemService {
         BookingShortDto last = null, next = null;
         List<Booking> approved = bookingRepo.findByItemIdAndStatus(itemId, BookingStatus.APPROVED);
         LocalDateTime now = LocalDateTime.now();
-        Optional<Booking> lastOpt = approved.stream().filter(b -> b.getEnd().isBefore(now) || b.getEnd().isEqual(now))
-                .max(Comparator.comparing(Booking::getEnd));
-        Optional<Booking> nextOpt = approved.stream().filter(b -> b.getStart().isAfter(now) || b.getStart().isEqual(now))
-                .min(Comparator.comparing(Booking::getStart));
+        Optional<Booking> lastOpt = approved.stream().filter(b -> b.getEnd().isBefore(now) || b.getEnd().isEqual(now)).max(Comparator.comparing(Booking::getEnd));
+        Optional<Booking> nextOpt = approved.stream().filter(b -> b.getStart().isAfter(now) || b.getStart().isEqual(now)).min(Comparator.comparing(Booking::getStart));
         if (lastOpt.isPresent()) last = new BookingShortDto(lastOpt.get().getId(), lastOpt.get().getBookerId());
         if (nextOpt.isPresent()) next = new BookingShortDto(nextOpt.get().getId(), nextOpt.get().getBookerId());
 
@@ -82,10 +78,8 @@ public class ItemServiceImpl implements ItemService {
             BookingShortDto last = null, next = null;
             List<Booking> approved = bookingRepo.findByItemIdAndStatus(i.getId(), BookingStatus.APPROVED);
             LocalDateTime now = LocalDateTime.now();
-            Optional<Booking> lastOpt = approved.stream().filter(b -> b.getEnd().isBefore(now) || b.getEnd().isEqual(now))
-                    .max(Comparator.comparing(Booking::getEnd));
-            Optional<Booking> nextOpt = approved.stream().filter(b -> b.getStart().isAfter(now) || b.getStart().isEqual(now))
-                    .min(Comparator.comparing(Booking::getStart));
+            Optional<Booking> lastOpt = approved.stream().filter(b -> b.getEnd().isBefore(now) || b.getEnd().isEqual(now)).max(Comparator.comparing(Booking::getEnd));
+            Optional<Booking> nextOpt = approved.stream().filter(b -> b.getStart().isAfter(now) || b.getStart().isEqual(now)).min(Comparator.comparing(Booking::getStart));
             if (lastOpt.isPresent()) last = new BookingShortDto(lastOpt.get().getId(), lastOpt.get().getBookerId());
             if (nextOpt.isPresent()) next = new BookingShortDto(nextOpt.get().getId(), nextOpt.get().getBookerId());
             return ItemMapper.toResponse(i, last, next, comments.getOrDefault(i.getId(), Collections.emptyList()));
@@ -105,8 +99,7 @@ public class ItemServiceImpl implements ItemService {
         if (!userRepo.existsById(userId)) throw new NotFoundException("User not found: " + userId);
         Item item = itemRepo.findById(itemId).orElseThrow(() -> new NotFoundException("Item not found: " + itemId));
 
-        boolean ok = bookingRepo.findByBookerIdAndItemId(userId, itemId).stream()
-                .anyMatch(b -> b.getStatus() == BookingStatus.APPROVED && (b.getEnd().isBefore(LocalDateTime.now()) || b.getEnd().isEqual(LocalDateTime.now())));
+        boolean ok = bookingRepo.findByBookerIdAndItemId(userId, itemId).stream().anyMatch(b -> b.getStatus() == BookingStatus.APPROVED && (b.getEnd().isBefore(LocalDateTime.now()) || b.getEnd().isEqual(LocalDateTime.now())));
         if (!ok) throw new BadRequestException("User has not completed an approved booking for this item");
 
         CommentDto c = new CommentDto();

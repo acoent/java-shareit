@@ -25,9 +25,7 @@ public class BookingServiceImpl implements BookingService {
     private final InMemoryUserRepository userRepo;
     private final ConcurrentMap<Long, Object> locks = new ConcurrentHashMap<>();
 
-    public BookingServiceImpl(InMemoryBookingRepository bookingRepo,
-                              InMemoryItemRepository itemRepo,
-                              InMemoryUserRepository userRepo) {
+    public BookingServiceImpl(InMemoryBookingRepository bookingRepo, InMemoryItemRepository itemRepo, InMemoryUserRepository userRepo) {
         this.bookingRepo = bookingRepo;
         this.itemRepo = itemRepo;
         this.userRepo = userRepo;
@@ -38,10 +36,12 @@ public class BookingServiceImpl implements BookingService {
         if (userId == null || !userRepo.existsById(userId)) throw new NotFoundException("User not found: " + userId);
         if (dto == null || dto.getItemId() == null) throw new BadRequestException("Booking must specify itemId");
         Item item = itemRepo.findById(dto.getItemId()).orElseThrow(() -> new NotFoundException("Item not found: " + dto.getItemId()));
-        if (!Boolean.TRUE.equals(item.getAvailable())) throw new BadRequestException("Item is not available for booking");
+        if (!Boolean.TRUE.equals(item.getAvailable()))
+            throw new BadRequestException("Item is not available for booking");
         if (item.getOwnerId().equals(userId)) throw new NotFoundException("Owner cannot book own item");
 
-        if (dto.getStart() == null || dto.getEnd() == null) throw new BadRequestException("Start and end must be provided");
+        if (dto.getStart() == null || dto.getEnd() == null)
+            throw new BadRequestException("Start and end must be provided");
         if (!dto.getStart().isBefore(dto.getEnd())) throw new BadRequestException("Start must be before end");
         if (dto.getEnd().isBefore(LocalDateTime.now())) throw new BadRequestException("End must be in the future");
 
@@ -84,7 +84,8 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto getById(Long userId, Long bookingId) {
         Booking b = bookingRepo.findById(bookingId).orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
         Item item = itemRepo.findById(b.getItemId()).orElseThrow(() -> new NotFoundException("Item not found: " + b.getItemId()));
-        if (!b.getBookerId().equals(userId) && !item.getOwnerId().equals(userId)) throw new ForbiddenException("Not authorized to view booking");
+        if (!b.getBookerId().equals(userId) && !item.getOwnerId().equals(userId))
+            throw new ForbiddenException("Not authorized to view booking");
         return BookingMapper.toDto(b);
     }
 

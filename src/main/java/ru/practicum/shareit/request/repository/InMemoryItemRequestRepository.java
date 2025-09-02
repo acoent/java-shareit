@@ -21,7 +21,10 @@ public class InMemoryItemRequestRepository {
         return r;
     }
 
-    public Optional<ItemRequest> findById(Long id) { return Optional.ofNullable(requests.get(id)); }
+    public Optional<ItemRequest> findById(Long id) {
+        return Optional.ofNullable(requests.get(id));
+    }
+
     public List<ItemRequest> findByRequester(Long requesterId) {
         return requests.values().stream().filter(r -> r.getRequesterId().equals(requesterId)).sorted(Comparator.comparing(ItemRequest::getCreated).reversed()).collect(Collectors.toList());
     }

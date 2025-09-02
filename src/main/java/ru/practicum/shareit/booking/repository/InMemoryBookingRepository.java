@@ -20,7 +20,9 @@ public class InMemoryBookingRepository {
         return b;
     }
 
-    public Optional<Booking> findById(Long id) { return Optional.ofNullable(bookings.get(id)); }
+    public Optional<Booking> findById(Long id) {
+        return Optional.ofNullable(bookings.get(id));
+    }
 
     public List<Booking> findByItemId(Long itemId) {
         return bookings.values().stream().filter(b -> b.getItemId().equals(itemId)).collect(Collectors.toList());
