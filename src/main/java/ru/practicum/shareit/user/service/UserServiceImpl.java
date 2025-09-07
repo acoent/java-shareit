@@ -1,70 +1,74 @@
 package ru.practicum.shareit.user.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.ConflictException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.InMemoryUserRepository;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.ConflictException;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final InMemoryUserRepository repo;
 
-    public UserServiceImpl(InMemoryUserRepository repo) {
-        this.repo = repo;
-    }
+    private final UserRepository userRepo;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto create(UserDto dto) {
-        validate(dto);
-        repo.findByEmail(dto.getEmail()).ifPresent(u -> {
-            throw new ConflictException("Email already exists: " + dto.getEmail());
+        userRepo.findByEmail(dto.getEmail()).ifPresent(u -> {
+            throw new ConflictException("Email already in use");
         });
-        User u = UserMapper.toModel(dto);
-        u.setId(null);
-        User saved = repo.save(u);
-        return UserMapper.toDto(saved);
+
+        User user = userMapper.toModel(dto);
+        user = userRepo.save(user);
+        return userMapper.toDto(user);
     }
 
     @Override
     public UserDto update(Long id, UserDto dto) {
-        User existing = repo.findById(id).orElseThrow(() -> new NotFoundException("User not found: " + id));
-        if (dto.getName() != null) existing.setName(dto.getName());
-        if (dto.getEmail() != null) {
-            repo.findByEmail(dto.getEmail()).ifPresent(u -> {
-                if (!u.getId().equals(id)) throw new ConflictException("Email already exists: " + dto.getEmail());
-            });
-            existing.setEmail(dto.getEmail());
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found: " + id));
+
+        if (dto.getName() != null) {
+            user.setName(dto.getName());
         }
-        validate(UserMapper.toDto(existing));
-        repo.save(existing);
-        return UserMapper.toDto(existing);
+
+        if (dto.getEmail() != null) {
+            userRepo.findByEmail(dto.getEmail())
+                    .filter(existing -> !existing.getId().equals(id))
+                    .ifPresent(existing -> {
+                        throw new ConflictException("Email already in use");
+                    });
+            user.setEmail(dto.getEmail());
+        }
+
+        userRepo.save(user);
+        return userMapper.toDto(user);
     }
 
     @Override
     public UserDto getById(Long id) {
-        return UserMapper.toDto(repo.findById(id).orElseThrow(() -> new NotFoundException("User not found: " + id)));
+        return userRepo.findById(id)
+                .map(userMapper::toDto)
+                .orElseThrow(() -> new NotFoundException("User not found: " + id));
     }
 
     @Override
     public List<UserDto> getAll() {
-        return repo.findAll().stream().map(UserMapper::toDto).collect(Collectors.toList());
+        return userRepo.findAll().stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void delete(Long id) {
-        repo.deleteById(id);
-    }
-
-    private void validate(UserDto dto) {
-        if (dto.getName() == null || dto.getName().isBlank()) throw new BadRequestException("Name is required");
-        if (dto.getEmail() == null || dto.getEmail().isBlank() || !dto.getEmail().contains("@"))
-            throw new BadRequestException("Valid email is required");
+        if (!userRepo.existsById(id)) throw new NotFoundException("User not found: " + id);
+        userRepo.deleteById(id);
     }
 }

@@ -10,29 +10,45 @@ import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryItemRepository {
-    private final Map<Long, Item> items = new ConcurrentHashMap<>();
-    private final AtomicLong nextId = new AtomicLong(1);
+
+    private final Map<Long, Item> storage = new ConcurrentHashMap<>();
+    private final AtomicLong seq = new AtomicLong(1);
 
     public Item save(Item item) {
-        if (item.getId() == null) item.setId(nextId.getAndIncrement());
-        items.put(item.getId(), item);
+        if (item.getId() == null) {
+            item.setId(seq.getAndIncrement());
+        }
+        storage.put(item.getId(), item);
         return item;
     }
 
     public Optional<Item> findById(Long id) {
-        return Optional.ofNullable(items.get(id));
+        return Optional.ofNullable(storage.get(id));
     }
 
-    public List<Item> findAllByOwner(Long ownerId) {
-        return items.values().stream().filter(i -> i.getOwnerId().equals(ownerId)).sorted(Comparator.comparing(Item::getId)).collect(Collectors.toList());
+    public List<Item> findByOwnerId(Long ownerId) {
+        return storage.values().stream()
+                .filter(i -> Objects.equals(i.getOwnerId(), ownerId))
+                .sorted(Comparator.comparing(Item::getId))
+                .collect(Collectors.toList());
     }
 
     public List<Item> searchAvailableByText(String text) {
+        if (text == null || text.isBlank()) return List.of();
         String q = text.toLowerCase();
-        return items.values().stream().filter(i -> Boolean.TRUE.equals(i.getAvailable())).filter(i -> (i.getName() != null && i.getName().toLowerCase().contains(q)) || (i.getDescription() != null && i.getDescription().toLowerCase().contains(q))).sorted(Comparator.comparing(Item::getId)).collect(Collectors.toList());
+        return storage.values().stream()
+                .filter(i -> Boolean.TRUE.equals(i.getAvailable()))
+                .filter(i -> (i.getName() != null && i.getName().toLowerCase().contains(q))
+                        || (i.getDescription() != null && i.getDescription().toLowerCase().contains(q)))
+                .sorted(Comparator.comparing(Item::getId))
+                .collect(Collectors.toList());
     }
 
-    public List<Item> findAll() {
-        return new ArrayList<>(items.values());
+    public boolean existsById(Long id) {
+        return storage.containsKey(id);
+    }
+
+    public void deleteById(Long id) {
+        storage.remove(id);
     }
 }

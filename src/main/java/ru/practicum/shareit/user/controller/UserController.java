@@ -1,5 +1,7 @@
 package ru.practicum.shareit.user.controller;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -9,20 +11,17 @@ import java.util.List;
 
 @RestController("userControllerBean")
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
     private final UserService service;
 
-    public UserController(UserService service) {
-        this.service = service;
-    }
-
     @PostMapping
-    public ResponseEntity<UserDto> create(@RequestBody UserDto dto) {
+    public ResponseEntity<UserDto> create(@RequestBody @Valid UserDto dto) {
         return ResponseEntity.ok(service.create(dto));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> get(@PathVariable Long id) {
+    public ResponseEntity<UserDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
