@@ -5,14 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Item {
+public class Comment {
     private Long id;
-    private String name;
-    private String description;
-    private Boolean available;
-    private Long ownerId;
+    private Long itemId;
+    private Long authorId;
+    private String text;
+    private LocalDateTime created;
 }
