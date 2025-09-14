@@ -6,6 +6,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.common.HeaderConstants;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
@@ -22,24 +23,26 @@ public class ItemRequestController {
     }
 
     @PostMapping
-    public ResponseEntity<ItemRequestDto> create(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid ItemRequestDto dto) {
+    public ResponseEntity<ItemRequestDto> create(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
+                                                 @RequestBody @Valid ItemRequestDto dto) {
         return ResponseEntity.ok(service.create(userId, dto));
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemRequestDto>> getByRequester(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<List<ItemRequestDto>> getByRequester(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId) {
         return ResponseEntity.ok(service.getByRequester(userId));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ItemRequestDto>> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<List<ItemRequestDto>> getAll(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                                        @RequestParam(defaultValue = "0") @PositiveOrZero int from,
                                                        @RequestParam(defaultValue = "10") @Positive int size) {
         return ResponseEntity.ok(service.getAll(userId, from, size));
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity<ItemRequestDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long requestId) {
+    public ResponseEntity<ItemRequestDto> getById(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
+                                                  @PathVariable Long requestId) {
         return ResponseEntity.ok(service.getById(userId, requestId));
     }
 }

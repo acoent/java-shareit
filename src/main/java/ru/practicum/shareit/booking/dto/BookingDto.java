@@ -1,35 +1,32 @@
 package ru.practicum.shareit.booking.dto;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.validation.StartBeforeEnd;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@StartBeforeEnd
 public class BookingDto {
+
     private Long id;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "itemId must be provided")
     private Long itemId;
+
+    @NotNull(message = "start must be provided")
+    private LocalDateTime start;
+
+    @NotNull(message = "end must be provided")
+    private LocalDateTime end;
 
     private Long bookerId;
 
-    @NotNull
-    @Future
-    private LocalDateTime start;
-
-    @NotNull
-    @Future
-    private LocalDateTime end;
-
-    private String status;
+    private BookingStatus status;
 }

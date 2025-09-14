@@ -5,7 +5,6 @@ import jakarta.validation.ConstraintValidatorContext;
 import ru.practicum.shareit.booking.dto.BookingDto;
 
 public class StartBeforeEndValidator implements ConstraintValidator<StartBeforeEnd, BookingDto> {
-
     @Override
     public boolean isValid(BookingDto dto, ConstraintValidatorContext context) {
         if (dto == null) return true;

@@ -1,25 +1,29 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.*;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ItemDto {
+
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "name must be provided")
     private String name;
 
     @NotBlank
     private String description;
 
-    @NotNull
+    @NotNull(message = "available must be provided")
     private Boolean available;
+
+    private Long requestId;
+
+    private Long ownerId;
 }

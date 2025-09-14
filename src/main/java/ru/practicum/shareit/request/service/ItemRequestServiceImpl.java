@@ -2,7 +2,6 @@ package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
@@ -24,9 +23,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto create(Long userId, ItemRequestDto dto) {
-        if (!userRepo.existsById(userId)) throw new NotFoundException("User not found: " + userId);
-        if (dto == null || dto.getDescription() == null || dto.getDescription().isBlank()) {
-            throw new BadRequestException("Description required");
+        if (!userRepo.existsById(userId)) {
+            throw new NotFoundException("User not found: " + userId);
         }
 
         ItemRequest request = requestMapper.toModel(dto);
@@ -39,7 +37,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getByRequester(Long userId) {
-        if (!userRepo.existsById(userId)) throw new NotFoundException("User not found: " + userId);
+        if (!userRepo.existsById(userId)) {
+            throw new NotFoundException("User not found: " + userId);
+        }
 
         return requestRepo.findByRequesterId(userId).stream()
                 .map(requestMapper::toDto)
@@ -48,9 +48,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getAll(Long userId, int from, int size) {
-        if (!userRepo.existsById(userId)) throw new NotFoundException("User not found: " + userId);
-        if (from < 0) throw new BadRequestException("from must be >= 0");
-        if (size <= 0) throw new BadRequestException("size must be > 0");
+        if (!userRepo.existsById(userId)) {
+            throw new NotFoundException("User not found: " + userId);
+        }
 
         return requestRepo.findAll().stream()
                 .filter(r -> !r.getRequesterId().equals(userId))
@@ -61,7 +61,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto getById(Long userId, Long requestId) {
-        if (!userRepo.existsById(userId)) throw new NotFoundException("User not found: " + userId);
+        if (!userRepo.existsById(userId)) {
+            throw new NotFoundException("User not found: " + userId);
+        }
 
         ItemRequest request = requestRepo.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Request not found: " + requestId));

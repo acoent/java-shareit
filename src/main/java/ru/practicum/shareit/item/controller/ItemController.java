@@ -6,6 +6,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.common.HeaderConstants;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -25,24 +26,27 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<ItemDto> create(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
             @RequestBody @Valid ItemDto dto
     ) {
         return ResponseEntity.ok(service.create(userId, dto));
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemDto> update(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId, @RequestBody ItemDto dto) {
+    public ResponseEntity<ItemDto> update(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
+                                          @PathVariable Long itemId,
+                                          @RequestBody ItemDto dto) {
         return ResponseEntity.ok(service.update(userId, itemId, dto));
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+    public ResponseEntity<ItemDto> getById(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
+                                           @PathVariable Long itemId) {
         return ResponseEntity.ok(service.getById(userId, itemId));
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getByOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<List<ItemDto>> getByOwner(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                                     @RequestParam(defaultValue = "0") @PositiveOrZero int from,
                                                     @RequestParam(defaultValue = "10") @Positive int size) {
         return ResponseEntity.ok(service.getByOwner(userId, from, size));
@@ -56,7 +60,7 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<CommentDto> addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<CommentDto> addComment(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                                  @PathVariable Long itemId,
                                                  @RequestBody @Valid CommentDto dto) {
         return ResponseEntity.ok(service.addComment(userId, itemId, dto));
