@@ -1,10 +1,10 @@
 package ru.practicum.shareit.booking.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.validation.StartBeforeEnd;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter

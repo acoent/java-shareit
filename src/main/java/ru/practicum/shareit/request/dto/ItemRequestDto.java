@@ -1,8 +1,8 @@
 package ru.practicum.shareit.request.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Getter
