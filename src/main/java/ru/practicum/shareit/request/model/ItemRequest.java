@@ -1,7 +1,9 @@
-package ru.practicum.shareit.request.dto;
+package ru.practicum.shareit.request.model;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -9,14 +11,9 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class ItemRequestDto {
+public class ItemRequest {
     private Long id;
-
-    @NotBlank(message = "description must be provided")
     private String description;
-
     private Long requesterId;
-
     private LocalDateTime created;
 }
