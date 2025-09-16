@@ -72,39 +72,39 @@ The main entities in the system:
 ## Project Structure
 
 The project follows a **feature-based package layout**:
-
+```
 src/main/java/ru/practicum/shareit/
 ├── booking/
-│ ├── controller/
-│ ├── dto/
-│ ├── service/
-│ ├── mapper/
-│ ├── model/
-│ └── repository/
+│   ├── controller/
+│   ├── dto/
+│   ├── service/
+│   ├── mapper/
+│   ├── model/
+│   └── repository/
 ├── item/
-│ ├── controller/
-│ ├── dto/
-│ ├── service/
-│ ├── mapper/
-│ ├── model/
-│ └── repository/
+│   ├── controller/
+│   ├── dto/
+│   ├── service/
+│   ├── mapper/
+│   ├── model/
+│   └── repository/
 ├── request/
-│ ├── controller/
-│ ├── dto/
-│ ├── service/
-│ ├── mapper/
-│ ├── model/
-│ └── repository/
+│   ├── controller/
+│   ├── dto/
+│   ├── service/
+│   ├── mapper/
+│   ├── model/
+│   └── repository/
 ├── user/
-│ ├── controller/
-│ ├── dto/
-│ ├── service/
-│ ├── mapper/
-│ ├── model/
-│ └── repository/
+│   ├── controller/
+│   ├── dto/
+│   ├── service/
+│   ├── mapper/
+│   ├── model/
+│   └── repository/
 └── common/
-└── HeaderConstants.java
-
+    └── HeaderConstants.java
+```
 markdown
 Copy code
 
