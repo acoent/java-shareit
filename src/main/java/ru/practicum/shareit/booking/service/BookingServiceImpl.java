@@ -43,7 +43,7 @@ public class BookingServiceImpl implements BookingService {
         if (dto.getItemId() == null) {
             throw new BadRequestException("itemId must be provided");
         }
-        
+
         Item item = itemRepo.findById(dto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Item not found: " + dto.getItemId()));
 
