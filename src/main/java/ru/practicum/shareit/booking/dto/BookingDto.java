@@ -20,13 +20,15 @@ public class BookingDto {
     @NotNull(message = "itemId must be provided")
     private Long itemId;
 
+    private ru.practicum.shareit.item.dto.ItemShortDto item;
+    private Long bookerId;
+    private ru.practicum.shareit.user.dto.UserShortDto booker;
+
     @NotNull(message = "start must be provided")
     private LocalDateTime start;
 
     @NotNull(message = "end must be provided")
     private LocalDateTime end;
-
-    private Long bookerId;
 
     private BookingStatus status;
 }

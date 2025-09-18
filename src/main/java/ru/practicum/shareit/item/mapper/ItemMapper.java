@@ -1,14 +1,55 @@
 package ru.practicum.shareit.item.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.BookingShortDto;
 
-@Mapper(componentModel = "spring")
-public interface ItemMapper {
-    @Mapping(target = "ownerId", source = "ownerId")
-    ItemDto toDto(Item item);
+import java.util.List;
+import java.util.stream.Collectors;
 
-    Item toModel(ItemDto dto);
+@Component
+public class ItemMapper {
+
+    public ItemDto toDto(Item i) {
+        if (i == null) return null;
+        ItemDto dto = new ItemDto();
+        dto.setId(i.getId());
+        dto.setName(i.getName());
+        dto.setDescription(i.getDescription());
+        dto.setAvailable(i.getAvailable());
+        dto.setRequestId(i.getRequestId());
+        if (i.getOwner() != null) dto.setOwnerId(i.getOwner().getId());
+        return dto;
+    }
+
+    public Item toModel(ItemDto d) {
+        if (d == null) return null;
+        Item i = Item.builder()
+                .id(d.getId())
+                .name(d.getName())
+                .description(d.getDescription())
+                .available(d.getAvailable() != null ? d.getAvailable() : Boolean.TRUE)
+                .requestId(d.getRequestId())
+                .build();
+        return i;
+    }
+
+    public ItemResponseDto toResponseDto(Item i, BookingShortDto last, BookingShortDto next, List<?> comments) {
+        ItemResponseDto r = new ItemResponseDto();
+        r.setId(i.getId());
+        r.setName(i.getName());
+        r.setDescription(i.getDescription());
+        r.setAvailable(i.getAvailable());
+        r.setRequestId(i.getRequestId());
+        r.setComments((List) comments);
+        r.setLastBooking(last);
+        r.setNextBooking(next);
+        return r;
+    }
+
+    public List<ItemDto> toDtoList(List<Item> items) {
+        return items.stream().map(this::toDto).collect(Collectors.toList());
+    }
 }
