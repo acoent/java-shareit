@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -47,8 +49,8 @@ public class BookingController {
     public ResponseEntity<List<BookingResponseDto>> getByBooker(
             @RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
             @RequestParam(value = "state", required = false, defaultValue = "ALL") String state,
-            @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+            @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero int from,
+            @RequestParam(value = "size", required = false, defaultValue = "10") @Positive int size) {
         List<BookingResponseDto> list = service.getByBooker(userId, state, from, size);
         return ResponseEntity.ok(list);
     }
@@ -57,8 +59,8 @@ public class BookingController {
     public ResponseEntity<List<BookingResponseDto>> getByOwner(
             @RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long ownerId,
             @RequestParam(value = "state", required = false, defaultValue = "ALL") String state,
-            @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+            @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero int from,
+            @RequestParam(value = "size", required = false, defaultValue = "10") @Positive int size) {
         List<BookingResponseDto> list = service.getByOwner(ownerId, state, from, size);
         return ResponseEntity.ok(list);
     }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +24,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -105,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
             }
         }
 
-        return itemMapper.toResponseDto(item, lastShort, nextShort, (List) commentDtos);
+        return itemMapper.toResponseDto(item, lastShort, nextShort, commentDtos);
     }
 
     @Override
@@ -115,20 +114,14 @@ public class ItemServiceImpl implements ItemService {
         if (from < 0) from = 0;
         if (size <= 0) size = DEFAULT_SIZE;
 
-        List<Item> items = itemRepo.findAllByOwner_Id(ownerId);
+        int page = from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
 
-        List<Item> sorted = items.stream()
-                .sorted(Comparator.comparing(Item::getId))
-                .collect(Collectors.toList());
-
-        List<Item> page = sorted.stream()
-                .skip(from)
-                .limit(size)
-                .collect(Collectors.toList());
+        Page<Item> itemsPage = itemRepo.findAllByOwner_Id(ownerId, pageRequest);
 
         LocalDateTime now = LocalDateTime.now();
 
-        List<ItemResponseDto> result = page.stream().map(item -> {
+        List<ItemResponseDto> result = itemsPage.getContent().stream().map(item -> {
             Long itemId = item.getId();
 
             BookingShortDto lastShort = null;
@@ -153,7 +146,7 @@ public class ItemServiceImpl implements ItemService {
             List<Comment> comments = commentRepo.findByItem_IdOrderByCreatedDesc(itemId);
             List<CommentDto> commentDtos = comments.stream().map(commentMapper::toDto).collect(Collectors.toList());
 
-            return itemMapper.toResponseDto(item, lastShort, nextShort, (List) commentDtos);
+            return itemMapper.toResponseDto(item, lastShort, nextShort, commentDtos);
         }).collect(Collectors.toList());
 
         return result;
@@ -161,7 +154,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(String text, int from, int size) {
-        if (text == null || text.isBlank()) return Collections.emptyList();
+        if (text == null || text.isBlank()) return List.of();
         if (from < 0) from = 0;
         if (size <= 0) size = DEFAULT_SIZE;
         int page = from / size;
