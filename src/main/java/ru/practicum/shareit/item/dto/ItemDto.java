@@ -16,7 +16,7 @@ public class ItemDto {
     @NotBlank(message = "name must be provided")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "description must be provided")
     private String description;
 
     @NotNull(message = "available must be provided")

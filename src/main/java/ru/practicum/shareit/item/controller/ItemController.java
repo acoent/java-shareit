@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.common.HeaderConstants;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.List;
@@ -29,40 +30,46 @@ public class ItemController {
             @RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
             @RequestBody @Valid ItemDto dto
     ) {
-        return ResponseEntity.ok(service.create(userId, dto));
+        ItemDto created = service.create(userId, dto);
+        return ResponseEntity.ok(created);
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> update(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                           @PathVariable Long itemId,
                                           @RequestBody ItemDto dto) {
-        return ResponseEntity.ok(service.update(userId, itemId, dto));
+        ItemDto updated = service.update(userId, itemId, dto);
+        return ResponseEntity.ok(updated);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getById(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
-                                           @PathVariable Long itemId) {
-        return ResponseEntity.ok(service.getById(userId, itemId));
+    public ResponseEntity<ItemResponseDto> getById(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
+                                                   @PathVariable Long itemId) {
+        ItemResponseDto response = service.getById(userId, itemId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getByOwner(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
-                                                    @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                                    @RequestParam(defaultValue = "10") @Positive int size) {
-        return ResponseEntity.ok(service.getByOwner(userId, from, size));
+    public ResponseEntity<List<ItemResponseDto>> getByOwner(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
+                                                            @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                            @RequestParam(defaultValue = "10") @Positive int size) {
+        List<ItemResponseDto> items = service.getByOwner(userId, from, size);
+        return ResponseEntity.ok(items);
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<ItemDto>> search(@RequestParam String text,
                                                 @RequestParam(defaultValue = "0") @PositiveOrZero int from,
                                                 @RequestParam(defaultValue = "10") @Positive int size) {
-        return ResponseEntity.ok(service.search(text, from, size));
+        List<ItemDto> result = service.search(text, from, size);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<CommentDto> addComment(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                                  @PathVariable Long itemId,
                                                  @RequestBody @Valid CommentDto dto) {
-        return ResponseEntity.ok(service.addComment(userId, itemId, dto));
+        CommentDto created = service.addComment(userId, itemId, dto);
+        return ResponseEntity.ok(created);
     }
 }
