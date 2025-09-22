@@ -23,6 +23,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Booking service implementation.
+ *
+ * Responsibilities split:
+ *  - Field-level validation (NotNull, Future, StartBeforeEnd) is performed on DTO level in controller (@Valid).
+ *  - Service performs business validations: entity existence, ownership rules, availability, booking state changes.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -33,40 +40,31 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepo;
     private final BookingMapper bookingMapper;
 
-    private static final int DEFAULT_SIZE = 10;
-
     @Override
     @Transactional
     public BookingResponseDto create(Long userId, BookingDto dto) {
         if (dto == null) throw new BadRequestException("Booking data must be provided");
 
-        if (!userRepo.existsById(userId)) {
-            throw new NotFoundException("User not found: " + userId);
-        }
+        // Fetch booker — this both validates existence and returns entity (saves extra existsById + find call).
+        User booker = userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found: " + userId));
 
+        // Fetch item
         Item item = itemRepo.findById(dto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Item not found: " + dto.getItemId()));
 
+        // Business rule: owner cannot book own item.
+        // This is business logic, so it belongs to the service layer (not controller).
         if (item.getOwner() != null && item.getOwner().getId().equals(userId)) {
             throw new NotFoundException("Owner cannot book own item");
         }
 
-        if (dto.getStart() == null || dto.getEnd() == null) {
-            throw new BadRequestException("start and end must be provided");
-        }
-        if (!dto.getStart().isBefore(dto.getEnd())) {
-            throw new BadRequestException("start must be before end");
-        }
-        LocalDateTime now = LocalDateTime.now();
-        if (dto.getStart().isBefore(now) || dto.getEnd().isBefore(now)) {
-            throw new BadRequestException("start and end must be in the future");
-        }
+        // Field validations (null, order, future) are handled by @Valid on BookingDto in controller.
+        // Service focuses on business constraints: availability, state, existence.
 
         if (Boolean.FALSE.equals(item.getAvailable())) {
             throw new BadRequestException("Item is not available");
         }
-
-        User booker = userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found: " + userId));
 
         Booking booking = bookingMapper.toModel(dto);
         booking.setItem(item);
@@ -117,7 +115,7 @@ public class BookingServiceImpl implements BookingService {
         if (!userRepo.existsById(bookerId)) throw new NotFoundException("User not found: " + bookerId);
 
         if (from < 0) from = 0;
-        if (size <= 0) size = DEFAULT_SIZE;
+        if (size <= 0) throw new BadRequestException("size must be positive");
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
 
@@ -156,7 +154,7 @@ public class BookingServiceImpl implements BookingService {
         if (!userRepo.existsById(ownerId)) throw new NotFoundException("User not found: " + ownerId);
 
         if (from < 0) from = 0;
-        if (size <= 0) size = DEFAULT_SIZE;
+        if (size <= 0) throw new BadRequestException("size must be positive");
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
 

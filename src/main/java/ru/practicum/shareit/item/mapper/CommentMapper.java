@@ -6,6 +6,10 @@ import ru.practicum.shareit.item.model.Comment;
 
 import java.time.LocalDateTime;
 
+/**
+ * Simple DTO <-> Model mapper for Comment.
+ * Kept as a Spring component (manual) — mapping logic is trivial.
+ */
 @Component
 public class CommentMapper {
 

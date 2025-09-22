@@ -28,6 +28,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Item service implementation.
+ *
+ * Notes:
+ *  - Controller defines default request parameter values (from=0, size=10). Service still keeps a DEFAULT_SIZE
+ *    as a defensive default in case service methods are called directly from other code paths (tests, internal calls).
+ *    This avoids unexpected behavior if caller passes 0 or negative size accidentally.
+ *
+ *  - For owner list retrieval pagination we use a pageable repository method so DB limits rows returned.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -117,6 +127,7 @@ public class ItemServiceImpl implements ItemService {
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
 
+        // DB will return only the requested page, avoiding fetching all owner's items into memory.
         Page<Item> itemsPage = itemRepo.findAllByOwner_Id(ownerId, pageRequest);
 
         LocalDateTime now = LocalDateTime.now();
