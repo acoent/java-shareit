@@ -29,6 +29,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     /**
      * Fetch bookings for a booker with item and booker eagerly fetched to avoid N+1 when mapping to DTOs.
      */
+    /**
+    * аннотация задаёт жадную (eager) подгрузку связанных сущностей item и booker в том же SQL-запросе,
+    * чтобы избежать эффекта N+1 и лишних отдельных SELECT'ов при маппинге результатов в DTO.
+    */
     @EntityGraph(attributePaths = {"item", "booker"})
     Page<Booking> findByBooker_IdOrderByStartDesc(Long bookerId, Pageable pageable);
 

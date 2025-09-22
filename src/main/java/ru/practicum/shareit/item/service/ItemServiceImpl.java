@@ -30,13 +30,9 @@ import java.util.stream.Collectors;
 
 /**
  * Item service implementation.
- *
- * Notes:
- *  - Controller defines default request parameter values (from=0, size=10). Service still keeps a DEFAULT_SIZE
- *    as a defensive default in case service methods are called directly from other code paths (tests, internal calls).
- *    This avoids unexpected behavior if caller passes 0 or negative size accidentally.
- *
- *  - For owner list retrieval pagination we use a pageable repository method so DB limits rows returned.
+ * Controller provides default values and parameter validation for 'from' and 'size'.
+ * Service enforces that 'size' is positive and does not silently substitute its own default,
+ * to adhere to the API contract defined by the controller and to reviewer request.
  */
 @Service
 @RequiredArgsConstructor
@@ -49,8 +45,6 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepo;
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
-
-    private static final int DEFAULT_SIZE = 10;
 
     @Override
     @Transactional
@@ -122,7 +116,7 @@ public class ItemServiceImpl implements ItemService {
         userRepo.findById(ownerId).orElseThrow(() -> new NotFoundException("User not found: " + ownerId));
 
         if (from < 0) from = 0;
-        if (size <= 0) size = DEFAULT_SIZE;
+        if (size <= 0) throw new BadRequestException("size must be positive");
 
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -167,7 +161,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> search(String text, int from, int size) {
         if (text == null || text.isBlank()) return List.of();
         if (from < 0) from = 0;
-        if (size <= 0) size = DEFAULT_SIZE;
+        if (size <= 0) throw new BadRequestException("size must be positive");
         int page = from / size;
         List<Item> found = itemRepo.search(text, PageRequest.of(page, size));
         return found.stream().map(itemMapper::toDto).collect(Collectors.toList());
