@@ -25,10 +25,6 @@ import java.util.stream.Collectors;
 
 /**
  * Booking service implementation.
- *
- * Responsibilities split:
- *  - Field-level validation (NotNull, Future, StartBeforeEnd) is performed on DTO level in controller (@Valid).
- *  - Service performs business validations: entity existence, ownership rules, availability, booking state changes.
  */
 @Service
 @RequiredArgsConstructor

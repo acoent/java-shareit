@@ -11,16 +11,6 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * ItemMapper — hybrid approach:
- *
- * 1) Simple mappings Item <-> ItemDto are done by MapStruct (interface methods).
- * 2) toResponseDto is implemented as a default method because it needs extra parameters
- *    (last/next booking and comments list) which are not part of Item entity.
- *
- * This satisfies the reviewer question "why not MapStruct" — we use MapStruct for simple conversions
- * while keeping manual code for the enriched response DTO assembly.
- */
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
 

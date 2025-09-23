@@ -24,11 +24,11 @@ public class Booking {
     @Column(name = "end_date", nullable = false)
     private LocalDateTime end;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "item_id", nullable = false)
     private ru.practicum.shareit.item.model.Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "booker_id", nullable = false)
     private ru.practicum.shareit.user.model.User booker;
 

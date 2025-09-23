@@ -30,9 +30,6 @@ import java.util.stream.Collectors;
 
 /**
  * Item service implementation.
- * Controller provides default values and parameter validation for 'from' and 'size'.
- * Service enforces that 'size' is positive and does not silently substitute its own default,
- * to adhere to the API contract defined by the controller and to reviewer request.
  */
 @Service
 @RequiredArgsConstructor

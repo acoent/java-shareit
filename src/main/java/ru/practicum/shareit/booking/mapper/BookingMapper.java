@@ -10,13 +10,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.user.dto.UserShortDto;
 
-/**
- * MapStruct mapper for Booking <-> DTOs.
- * componentModel = "spring" so Spring can inject it.
- *
- * We keep mapping of nested entities to short DTOs by helper methods here.
- * The service is responsible to attach Item/User entities to Booking model before saving.
- */
+
 @Mapper(componentModel = "spring")
 public interface BookingMapper {
 
