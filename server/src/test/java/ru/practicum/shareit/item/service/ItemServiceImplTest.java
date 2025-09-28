@@ -72,8 +72,8 @@ class ItemServiceImplTest {
         itemDto = ItemDto.builder().id(1L).name("Test Item").description("Test Description").available(true)
                 .ownerId(1L).build();
 
-        comment = Comment.builder().id(1L).text("Great item!").author(user).item(item).created(LocalDateTime.now()).
-                build();
+        comment = Comment.builder().id(1L).text("Great item!").author(user).item(item).created(LocalDateTime.now())
+                .build();
 
         commentDto = CommentDto.builder().id(1L).text("Great item!").authorId(1L).authorName("John Doe").itemId(1L)
                 .created(LocalDateTime.now()).build();
@@ -419,8 +419,8 @@ class ItemServiceImplTest {
         when(itemRepo.findById(itemId)).thenReturn(Optional.of(Item.builder().id(itemId).build()));
         when(bookingRepo.findByBooker_IdAndItem_IdAndStatusAndEndBefore(eq(authorId), eq(itemId),
                 eq(BookingStatus.APPROVED),
-                any())).thenReturn(List.of(Booking.builder().id(1L).end(LocalDateTime.now().minusDays(1)).
-                status(BookingStatus.APPROVED).build()));
+                any())).thenReturn(List.of(Booking.builder().id(1L).end(LocalDateTime.now().minusDays(1))
+                .status(BookingStatus.APPROVED).build()));
 
         Comment toSave = Comment.builder().id(999L).text(dto.getText()).build();
         when(commentMapper.toModel(dto)).thenReturn(Comment.builder().text(dto.getText()).build());

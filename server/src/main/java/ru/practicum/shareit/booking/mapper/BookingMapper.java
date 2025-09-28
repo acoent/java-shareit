@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -13,8 +12,6 @@ import ru.practicum.shareit.user.dto.UserShortDto;
 
 @Mapper(componentModel = "spring")
 public interface BookingMapper {
-
-    BookingMapper INSTANCE = Mappers.getMapper(BookingMapper.class);
 
     @Mapping(target = "item", ignore = true)
     @Mapping(target = "booker", ignore = true)
