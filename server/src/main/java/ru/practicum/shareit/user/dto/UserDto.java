@@ -14,11 +14,11 @@ public class UserDto {
 
     private Long id;
 
-    @NotBlank(message = "Name must not be blank")
+    @NotBlank(message = "name must be provided")
     @Size(max = 255, message = "Name is too long")
     private String name;
 
-    @NotBlank(message = "Email must not be blank")
-    @Email(message = "Email must be valid")
+    @NotBlank(message = "email must be provided")
+    @Email(message = "email must be valid")
     private String email;
 }
