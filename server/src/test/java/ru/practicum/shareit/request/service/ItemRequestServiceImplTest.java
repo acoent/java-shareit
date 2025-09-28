@@ -75,23 +75,31 @@ class ItemRequestServiceImplTest {
 
     @Test
     void create_Success() {
+        ItemRequestDto incomingDto = ItemRequestDto.builder()
+                .description(itemRequestDto.getDescription())
+                .build();
+
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-        when(itemRequestMapper.toModel(itemRequestDto)).thenReturn(itemRequest);
+        when(itemRequestMapper.toModel(eq(incomingDto))).thenReturn(ItemRequest.builder().description(incomingDto.getDescription()).build());
         when(itemRequestRepo.save(any(ItemRequest.class))).thenReturn(itemRequest);
         when(itemRequestMapper.toDto(itemRequest)).thenReturn(itemRequestDto);
 
-        ItemRequestDto result = itemRequestService.create(1L, itemRequestDto);
+        ItemRequestDto result = itemRequestService.create(1L, incomingDto);
 
         assertNotNull(result);
         assertEquals(itemRequestDto.getDescription(), result.getDescription());
         verify(itemRequestRepo).save(any(ItemRequest.class));
+        verify(itemRequestMapper).toModel(incomingDto);
+        verify(itemRequestMapper).toDto(itemRequest);
     }
 
     @Test
     void create_UserNotFound_ThrowsNotFoundException() {
         when(userRepo.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> itemRequestService.create(1L, itemRequestDto));
+        ItemRequestDto incomingDto = ItemRequestDto.builder().description("Need a drill").build();
+        assertThrows(NotFoundException.class, () -> itemRequestService.create(1L, incomingDto));
+        verify(userRepo).findById(1L);
+        verifyNoInteractions(itemRequestRepo, itemRequestMapper, itemService);
     }
 
     @Test
@@ -106,6 +114,11 @@ class ItemRequestServiceImplTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(itemRequestDto.getId(), result.get(0).getId());
+
+        verify(userRepo).findById(1L);
+        verify(itemRequestRepo).findByRequesterIdOrderByCreatedDesc(1L);
+        verify(itemRequestMapper).toDto(itemRequest);
+        verify(itemService).getByRequestId(1L);
     }
 
     @Test
@@ -113,6 +126,8 @@ class ItemRequestServiceImplTest {
         when(userRepo.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> itemRequestService.getByRequester(1L));
+        verify(userRepo).findById(1L);
+        verifyNoInteractions(itemRequestRepo, itemService, itemRequestMapper);
     }
 
     @Test
@@ -127,13 +142,19 @@ class ItemRequestServiceImplTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
+
+        verify(userRepo).findById(2L);
+        verify(itemRequestRepo).findByRequesterIdNot(eq(2L), any(PageRequest.class));
+        verify(itemRequestMapper).toDto(itemRequest);
+        verify(itemService).getByRequestId(1L);
     }
 
     @Test
     void getAll_InvalidSize_ThrowsIllegalArgumentException() {
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-
         assertThrows(IllegalArgumentException.class, () -> itemRequestService.getAll(1L, 0, 0));
+        verify(userRepo).findById(1L);
+        verifyNoInteractions(itemRequestRepo, itemRequestMapper, itemService);
     }
 
     @Test
@@ -147,6 +168,11 @@ class ItemRequestServiceImplTest {
 
         assertNotNull(result);
         assertEquals(itemRequestDto.getId(), result.getId());
+
+        verify(userRepo).findById(1L);
+        verify(itemRequestRepo).findById(1L);
+        verify(itemRequestMapper).toDto(itemRequest);
+        verify(itemService).getByRequestId(1L);
     }
 
     @Test
@@ -155,5 +181,8 @@ class ItemRequestServiceImplTest {
         when(itemRequestRepo.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> itemRequestService.getById(1L, 1L));
+        verify(userRepo).findById(1L);
+        verify(itemRequestRepo).findById(1L);
+        verifyNoMoreInteractions(itemRequestMapper, itemService);
     }
 }

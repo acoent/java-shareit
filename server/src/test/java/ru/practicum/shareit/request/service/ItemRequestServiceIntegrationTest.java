@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request.service;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,11 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
 @TestPropertySource(properties = "db.name=test")
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ItemRequestServiceIntegrationTest {
 
-    private final ItemRequestService itemRequestService;
-    private final UserService userService;
+    @Autowired
+    private ItemRequestService itemRequestService;
+
+    @Autowired
+    private UserService userService;
 
     @Test
     void createAndRetrieveItemRequest() {
