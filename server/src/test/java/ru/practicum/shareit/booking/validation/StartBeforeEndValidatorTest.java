@@ -5,7 +5,8 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StartBeforeEndValidatorTest {
 
