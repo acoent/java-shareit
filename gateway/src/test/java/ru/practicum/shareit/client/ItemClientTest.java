@@ -1,16 +1,13 @@
 package ru.practicum.shareit.client;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import ru.practicum.shareit.dto.ItemDto;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 class ItemClientTest {
 
@@ -21,7 +18,7 @@ class ItemClientTest {
     void setUp() {
         restTemplate = mock(RestTemplate.class);
         itemClient = new ItemClient("http://localhost:8080") {
-            protected ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Map<String, Object> parameters, Object body, Long userId) {
+            private ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Map<String, Object> parameters, Object body, Long userId) {
                 return ResponseEntity.ok(body);
             }
         };

@@ -12,7 +12,8 @@ import ru.practicum.shareit.dto.BookingDto;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -91,7 +92,7 @@ class BookingClientTest {
 
         assertEquals(expectedResponse, result);
         verify(spyClient).get(eq("/bookings"), argThat(params -> {
-            Map<String, Object> paramsMap = (Map<String, Object>) params;
+            Map<String, Object> paramsMap = params;
             return paramsMap.get("state").equals(state);
         }), eq(userId));
     }
@@ -109,7 +110,7 @@ class BookingClientTest {
 
         assertEquals(expectedResponse, result);
         verify(spyClient).get(eq("/bookings/owner"), argThat(params -> {
-            Map<String, Object> paramsMap = (Map<String, Object>) params;
+            Map<String, Object> paramsMap = params;
             return paramsMap.get("state").equals(state);
         }), eq(userId));
     }

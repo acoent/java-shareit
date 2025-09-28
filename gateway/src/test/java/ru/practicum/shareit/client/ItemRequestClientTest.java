@@ -8,7 +8,8 @@ import ru.practicum.shareit.dto.ItemRequestDto;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -60,7 +61,7 @@ class ItemRequestClientTest {
 
         assertEquals(expectedResponse, result);
         verify(spyClient).get(eq("/requests/all"), argThat(params -> {
-            Map<String, Object> paramsMap = (Map<String, Object>) params;
+            Map<String, Object> paramsMap = params;
             return paramsMap.get("from").equals(from) && paramsMap.get("size").equals(size);
         }), eq(userId));
     }

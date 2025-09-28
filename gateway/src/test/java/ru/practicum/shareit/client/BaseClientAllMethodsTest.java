@@ -4,11 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
@@ -22,27 +18,6 @@ class BaseClientAllMethodsTest {
     private RestTemplate rest;
     private TestClient client;
     private ArgumentCaptor<HttpEntity> httpEntityCaptor;
-
-    static class TestClient extends BaseClient {
-        public TestClient(RestTemplate rest, String serverUrl) {
-            super(rest, serverUrl);
-        }
-        public ResponseEntity<Object> doPut(String path, Object body) {
-            return put(path, body);
-        }
-        public ResponseEntity<Object> doPut(String path, Object body, Long userId) {
-            return put(path, body, userId);
-        }
-        public ResponseEntity<Object> doPatch(String path, Object body) {
-            return patch(path, body);
-        }
-        public ResponseEntity<Object> doDelete(String path) {
-            return delete(path);
-        }
-        public ResponseEntity<Object> doGet(String path, Map<String, Object> parameters, Long userId) {
-            return get(path, parameters, userId);
-        }
-    }
 
     @BeforeEach
     void setUp() {
@@ -99,5 +74,31 @@ class BaseClientAllMethodsTest {
         HttpHeaders h = httpEntityCaptor.getValue().getHeaders();
         assertThat(h.getFirst("X-Sharer-User-Id")).isEqualTo("123");
         assertThat(h.getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+    }
+
+    static class TestClient extends BaseClient {
+        public TestClient(RestTemplate rest, String serverUrl) {
+            super(rest, serverUrl);
+        }
+
+        public ResponseEntity<Object> doPut(String path, Object body) {
+            return put(path, body);
+        }
+
+        public ResponseEntity<Object> doPut(String path, Object body, Long userId) {
+            return put(path, body, userId);
+        }
+
+        public ResponseEntity<Object> doPatch(String path, Object body) {
+            return patch(path, body);
+        }
+
+        public ResponseEntity<Object> doDelete(String path) {
+            return delete(path);
+        }
+
+        public ResponseEntity<Object> doGet(String path, Map<String, Object> parameters, Long userId) {
+            return get(path, parameters, userId);
+        }
     }
 }
