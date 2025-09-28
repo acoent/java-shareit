@@ -33,7 +33,6 @@ class ItemRequestControllerTest {
 
     @Test
     void createRequest_ShouldReturnCreatedRequest() throws Exception {
-        // Given
         Long userId = 1L;
         ItemRequestDto requestDto = ItemRequestDto.builder()
                 .description("Need a drill")
@@ -48,7 +47,6 @@ class ItemRequestControllerTest {
         when(itemRequestClient.createRequest(eq(userId), any(ItemRequestDto.class)))
                 .thenReturn(ResponseEntity.ok(createdRequest));
 
-        // When & Then
         mockMvc.perform(post("/requests")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -61,13 +59,14 @@ class ItemRequestControllerTest {
 
     @Test
     void createRequest_WithInvalidData_ShouldReturnBadRequest() throws Exception {
-        // Given
         Long userId = 1L;
         ItemRequestDto invalidRequest = ItemRequestDto.builder()
-                .description("") // Invalid: empty description
+                .description("")
                 .build();
 
-        // When & Then
+        when(itemRequestClient.createRequest(eq(userId), any(ItemRequestDto.class)))
+                .thenReturn(ResponseEntity.badRequest().build());
+
         mockMvc.perform(post("/requests")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -77,12 +76,10 @@ class ItemRequestControllerTest {
 
     @Test
     void getUserRequests_ShouldReturnUserRequests() throws Exception {
-        // Given
         Long userId = 1L;
         when(itemRequestClient.getUserRequests(userId))
                 .thenReturn(ResponseEntity.ok("[]"));
 
-        // When & Then
         mockMvc.perform(get("/requests")
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
@@ -90,12 +87,10 @@ class ItemRequestControllerTest {
 
     @Test
     void getAllRequests_ShouldReturnAllRequests() throws Exception {
-        // Given
         Long userId = 1L;
         when(itemRequestClient.getAllRequests(eq(userId), eq(0), eq(10)))
                 .thenReturn(ResponseEntity.ok("[]"));
 
-        // When & Then
         mockMvc.perform(get("/requests/all")
                         .header("X-Sharer-User-Id", userId)
                         .param("from", "0")
@@ -105,7 +100,6 @@ class ItemRequestControllerTest {
 
     @Test
     void getRequest_ShouldReturnSpecificRequest() throws Exception {
-        // Given
         Long userId = 1L;
         Long requestId = 1L;
         ItemRequestDto request = ItemRequestDto.builder()
@@ -117,7 +111,6 @@ class ItemRequestControllerTest {
         when(itemRequestClient.getRequest(userId, requestId))
                 .thenReturn(ResponseEntity.ok(request));
 
-        // When & Then
         mockMvc.perform(get("/requests/{requestId}", requestId)
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk())

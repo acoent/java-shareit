@@ -19,7 +19,6 @@ class ItemDtoJsonTest {
 
     @Test
     void serialize_ShouldSerializeCorrectly() throws IOException {
-        // Given
         ItemDto itemDto = ItemDto.builder()
                 .id(1L)
                 .name("Drill")
@@ -28,10 +27,8 @@ class ItemDtoJsonTest {
                 .requestId(1L)
                 .build();
 
-        // When
         String json = objectMapper.writeValueAsString(itemDto);
 
-        // Then
         assertNotNull(json);
         assertTrue(json.contains("\"id\":1"));
         assertTrue(json.contains("\"name\":\"Drill\""));
@@ -42,13 +39,10 @@ class ItemDtoJsonTest {
 
     @Test
     void deserialize_ShouldDeserializeCorrectly() throws IOException {
-        // Given
         String json = "{\"id\":1,\"name\":\"Drill\",\"description\":\"Powerful drill for construction\",\"available\":true,\"requestId\":1}";
 
-        // When
         ItemDto itemDto = objectMapper.readValue(json, ItemDto.class);
 
-        // Then
         assertNotNull(itemDto);
         assertEquals(1L, itemDto.getId());
         assertEquals("Drill", itemDto.getName());
@@ -59,13 +53,10 @@ class ItemDtoJsonTest {
 
     @Test
     void deserialize_WithNullRequestId_ShouldDeserializeCorrectly() throws IOException {
-        // Given
         String json = "{\"id\":1,\"name\":\"Drill\",\"description\":\"Powerful drill for construction\",\"available\":true,\"requestId\":null}";
 
-        // When
         ItemDto itemDto = objectMapper.readValue(json, ItemDto.class);
 
-        // Then
         assertNotNull(itemDto);
         assertEquals(1L, itemDto.getId());
         assertEquals("Drill", itemDto.getName());
@@ -76,7 +67,6 @@ class ItemDtoJsonTest {
 
     @Test
     void roundTrip_ShouldMaintainDataIntegrity() throws IOException {
-        // Given
         ItemDto originalItem = ItemDto.builder()
                 .id(1L)
                 .name("Drill")
@@ -85,11 +75,9 @@ class ItemDtoJsonTest {
                 .requestId(1L)
                 .build();
 
-        // When
         String json = objectMapper.writeValueAsString(originalItem);
         ItemDto deserializedItem = objectMapper.readValue(json, ItemDto.class);
 
-        // Then
         assertEquals(originalItem.getId(), deserializedItem.getId());
         assertEquals(originalItem.getName(), deserializedItem.getName());
         assertEquals(originalItem.getDescription(), deserializedItem.getDescription());

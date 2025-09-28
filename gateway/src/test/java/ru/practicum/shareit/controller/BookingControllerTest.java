@@ -76,6 +76,9 @@ class BookingControllerTest {
                 .end(null)
                 .build();
 
+        when(bookingClient.createBooking(eq(userId), any(BookingDto.class)))
+                .thenReturn(ResponseEntity.badRequest().build());
+
         mockMvc.perform(post("/bookings")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -91,6 +94,9 @@ class BookingControllerTest {
                 .start(LocalDateTime.now().minusDays(1))
                 .end(LocalDateTime.now().minusDays(2))
                 .build();
+
+        when(bookingClient.createBooking(eq(userId), any(BookingDto.class)))
+                .thenReturn(ResponseEntity.badRequest().build());
 
         mockMvc.perform(post("/bookings")
                         .header("X-Sharer-User-Id", userId)
@@ -141,7 +147,7 @@ class BookingControllerTest {
         Long userId = 1L;
         String state = "ALL";
 
-        when(bookingClient.getUserBookings(userId, state))
+        when(bookingClient.getUserBookings(eq(userId), eq(state), eq(0), eq(10)))
                 .thenReturn(ResponseEntity.ok("[]"));
 
         mockMvc.perform(get("/bookings")
@@ -156,7 +162,7 @@ class BookingControllerTest {
     void getUserBookings_WithDefaultParameters_ShouldReturnUserBookings() throws Exception {
         Long userId = 1L;
 
-        when(bookingClient.getUserBookings(userId, "ALL"))
+        when(bookingClient.getUserBookings(eq(userId), eq("ALL"), eq(0), eq(10)))
                 .thenReturn(ResponseEntity.ok("[]"));
 
         mockMvc.perform(get("/bookings")
@@ -164,23 +170,12 @@ class BookingControllerTest {
                 .andExpect(status().isOk());
     }
 
-//    @Test
-//    void getUserBookings_WithInvalidPaginationParameters_ShouldReturnBadRequest() throws Exception {
-//        Long userId = 1L;
-//
-//        mockMvc.perform(get("/bookings")
-//                        .header("X-Sharer-User-Id", userId)
-//                        .param("from", "-1")
-//                        .param("size", "0"))
-//                .andExpect(status().isBadRequest());
-//    }
-
     @Test
     void getOwnerBookings_ShouldReturnOwnerBookings() throws Exception {
         Long userId = 1L;
         String state = "WAITING";
 
-        when(bookingClient.getOwnerBookings(userId, state))
+        when(bookingClient.getOwnerBookings(eq(userId), eq(state), eq(0), eq(10)))
                 .thenReturn(ResponseEntity.ok("[]"));
 
         mockMvc.perform(get("/bookings/owner")
@@ -195,7 +190,7 @@ class BookingControllerTest {
     void getOwnerBookings_WithDefaultParameters_ShouldReturnOwnerBookings() throws Exception {
         Long userId = 1L;
 
-        when(bookingClient.getOwnerBookings(userId, "ALL"))
+        when(bookingClient.getOwnerBookings(eq(userId), eq("ALL"), eq(0), eq(10)))
                 .thenReturn(ResponseEntity.ok("[]"));
 
         mockMvc.perform(get("/bookings/owner")

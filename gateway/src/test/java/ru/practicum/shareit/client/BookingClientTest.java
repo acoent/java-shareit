@@ -2,7 +2,6 @@ package ru.practicum.shareit.client;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +9,6 @@ import org.springframework.web.client.RestTemplate;
 import ru.practicum.shareit.dto.BookingDto;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -23,9 +21,6 @@ class BookingClientTest {
     @Mock
     private RestTemplate restTemplate;
 
-    @InjectMocks
-    private BookingClient bookingClient;
-
     @Test
     void createBooking_ShouldCallPostWithCorrectParameters() {
         Long userId = 1L;
@@ -36,7 +31,7 @@ class BookingClientTest {
                 .build();
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("created");
 
-        BookingClient spyClient = spy(new BookingClient("http://localhost:8080"));
+        BookingClient spyClient = spy(new BookingClient(restTemplate, "http://localhost:8080"));
         doReturn(expectedResponse).when(spyClient).post(eq("/bookings"), eq(bookingDto), eq(userId));
 
         ResponseEntity<Object> result = spyClient.createBooking(userId, bookingDto);
@@ -52,16 +47,14 @@ class BookingClientTest {
         Boolean approved = true;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("updated");
 
-        BookingClient spyClient = spy(new BookingClient("http://localhost:8080"));
-        doReturn(expectedResponse).when(spyClient).patch(anyString(), any(Map.class), eq(userId));
+        BookingClient spyClient = spy(new BookingClient(restTemplate, "http://localhost:8080"));
+        String expectedPath = "/bookings/" + bookingId + "?approved=" + approved;
+        doReturn(expectedResponse).when(spyClient).patch(eq(expectedPath), isNull(), eq(userId));
 
         ResponseEntity<Object> result = spyClient.updateBooking(userId, bookingId, approved);
 
         assertEquals(expectedResponse, result);
-        verify(spyClient).patch(eq("/bookings/" + bookingId), argThat(body -> {
-            Map<String, Object> bodyMap = (Map<String, Object>) body;
-            return bodyMap.get("approved").equals(approved);
-        }), eq(userId));
+        verify(spyClient).patch(expectedPath, null, userId);
     }
 
     @Test
@@ -70,7 +63,7 @@ class BookingClientTest {
         Long bookingId = 2L;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("booking");
 
-        BookingClient spyClient = spy(new BookingClient("http://localhost:8080"));
+        BookingClient spyClient = spy(new BookingClient(restTemplate, "http://localhost:8080"));
         doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(userId));
 
         ResponseEntity<Object> result = spyClient.getBooking(userId, bookingId);
@@ -83,42 +76,40 @@ class BookingClientTest {
     void getUserBookings_ShouldCallGetWithCorrectParameters() {
         Long userId = 1L;
         String state = "ALL";
+        int from = 0;
+        int size = 10;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("bookings");
 
-        BookingClient spyClient = spy(new BookingClient("http://localhost:8080"));
-        doReturn(expectedResponse).when(spyClient).get(anyString(), any(Map.class), eq(userId));
+        BookingClient spyClient = spy(new BookingClient(restTemplate, "http://localhost:8080"));
+        doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(userId));
 
-        ResponseEntity<Object> result = spyClient.getUserBookings(userId, state);
+        ResponseEntity<Object> result = spyClient.getUserBookings(userId, state, from, size);
 
         assertEquals(expectedResponse, result);
-        verify(spyClient).get(eq("/bookings"), argThat(params -> {
-            Map<String, Object> paramsMap = params;
-            return paramsMap.get("state").equals(state);
-        }), eq(userId));
+        verify(spyClient).get(eq("/bookings?state=" + state + "&from=" + from + "&size=" + size), isNull(), eq(userId));
     }
 
     @Test
     void getOwnerBookings_ShouldCallGetWithCorrectParameters() {
         Long userId = 1L;
         String state = "WAITING";
+        int from = 0;
+        int size = 10;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("owner bookings");
 
-        BookingClient spyClient = spy(new BookingClient("http://localhost:8080"));
-        doReturn(expectedResponse).when(spyClient).get(anyString(), any(Map.class), eq(userId));
+        BookingClient spyClient = spy(new BookingClient(restTemplate, "http://localhost:8080"));
+        doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(userId));
 
-        ResponseEntity<Object> result = spyClient.getOwnerBookings(userId, state);
+        ResponseEntity<Object> result = spyClient.getOwnerBookings(userId, state, from, size);
 
         assertEquals(expectedResponse, result);
-        verify(spyClient).get(eq("/bookings/owner"), argThat(params -> {
-            Map<String, Object> paramsMap = params;
-            return paramsMap.get("state").equals(state);
-        }), eq(userId));
+        verify(spyClient).get(eq("/bookings/owner?state=" + state + "&from=" + from + "&size=" + size), isNull(), eq(userId));
     }
 
     @Test
     void constructor_ShouldCreateClientWithCorrectServerUrl() {
         String serverUrl = "http://test-server:8080";
-        BookingClient client = new BookingClient(serverUrl);
+        BookingClient client = new BookingClient(restTemplate, serverUrl);
 
         assertNotNull(client);
     }

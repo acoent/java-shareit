@@ -27,7 +27,6 @@ class BookingDtoJsonTest {
 
     @Test
     void serialize_ShouldSerializeCorrectly() throws IOException {
-        // Given
         LocalDateTime start = LocalDateTime.now().plusDays(1);
         LocalDateTime end = LocalDateTime.now().plusDays(2);
         BookingDto bookingDto = BookingDto.builder()
@@ -37,10 +36,8 @@ class BookingDtoJsonTest {
                 .end(end)
                 .build();
 
-        // When
         String json = objectMapper.writeValueAsString(bookingDto);
 
-        // Then
         assertNotNull(json);
         assertTrue(json.contains("\"id\":1"));
         assertTrue(json.contains("\"itemId\":1"));
@@ -50,13 +47,8 @@ class BookingDtoJsonTest {
 
     @Test
     void deserialize_ShouldDeserializeCorrectly() throws IOException {
-        // Given
         String json = "{\"id\":1,\"itemId\":1,\"start\":\"2023-01-01T12:00:00\",\"end\":\"2023-01-02T12:00:00\"}";
-
-        // When
         BookingDto bookingDto = objectMapper.readValue(json, BookingDto.class);
-
-        // Then
         assertNotNull(bookingDto);
         assertEquals(1L, bookingDto.getId());
         assertEquals(1L, bookingDto.getItemId());
@@ -66,13 +58,8 @@ class BookingDtoJsonTest {
 
     @Test
     void deserialize_WithNullFields_ShouldDeserializeCorrectly() throws IOException {
-        // Given
         String json = "{\"id\":null,\"itemId\":1,\"start\":\"2023-01-01T12:00:00\",\"end\":\"2023-01-02T12:00:00\"}";
-
-        // When
         BookingDto bookingDto = objectMapper.readValue(json, BookingDto.class);
-
-        // Then
         assertNotNull(bookingDto);
         assertNull(bookingDto.getId());
         assertEquals(1L, bookingDto.getItemId());
@@ -82,7 +69,6 @@ class BookingDtoJsonTest {
 
     @Test
     void roundTrip_ShouldMaintainDataIntegrity() throws IOException {
-        // Given
         LocalDateTime start = LocalDateTime.now().plusDays(1);
         LocalDateTime end = LocalDateTime.now().plusDays(2);
         BookingDto originalBooking = BookingDto.builder()
@@ -91,12 +77,8 @@ class BookingDtoJsonTest {
                 .start(start)
                 .end(end)
                 .build();
-
-        // When
         String json = objectMapper.writeValueAsString(originalBooking);
         BookingDto deserializedBooking = objectMapper.readValue(json, BookingDto.class);
-
-        // Then
         assertEquals(originalBooking.getId(), deserializedBooking.getId());
         assertEquals(originalBooking.getItemId(), deserializedBooking.getItemId());
         assertEquals(originalBooking.getStart(), deserializedBooking.getStart());

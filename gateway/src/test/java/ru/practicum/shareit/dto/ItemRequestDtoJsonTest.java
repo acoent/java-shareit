@@ -27,7 +27,6 @@ class ItemRequestDtoJsonTest {
 
     @Test
     void serialize_ShouldSerializeCorrectly() throws IOException {
-        // Given
         LocalDateTime now = LocalDateTime.now();
         ItemRequestDto requestDto = ItemRequestDto.builder()
                 .id(1L)
@@ -35,11 +34,8 @@ class ItemRequestDtoJsonTest {
                 .requesterId(1L)
                 .created(now)
                 .build();
-
-        // When
         String json = objectMapper.writeValueAsString(requestDto);
 
-        // Then
         assertNotNull(json);
         assertTrue(json.contains("\"id\":1"));
         assertTrue(json.contains("\"description\":\"Need a drill\""));
@@ -49,13 +45,9 @@ class ItemRequestDtoJsonTest {
 
     @Test
     void deserialize_ShouldDeserializeCorrectly() throws IOException {
-        // Given
         String json = "{\"id\":1,\"description\":\"Need a drill\",\"requesterId\":1,\"created\":\"2023-01-01T12:00:00\"}";
-
-        // When
         ItemRequestDto requestDto = objectMapper.readValue(json, ItemRequestDto.class);
 
-        // Then
         assertNotNull(requestDto);
         assertEquals(1L, requestDto.getId());
         assertEquals("Need a drill", requestDto.getDescription());
@@ -65,13 +57,9 @@ class ItemRequestDtoJsonTest {
 
     @Test
     void deserialize_WithNullFields_ShouldDeserializeCorrectly() throws IOException {
-        // Given
         String json = "{\"id\":null,\"description\":\"Need a drill\",\"requesterId\":null,\"created\":null}";
-
-        // When
         ItemRequestDto requestDto = objectMapper.readValue(json, ItemRequestDto.class);
 
-        // Then
         assertNotNull(requestDto);
         assertNull(requestDto.getId());
         assertEquals("Need a drill", requestDto.getDescription());
@@ -81,7 +69,6 @@ class ItemRequestDtoJsonTest {
 
     @Test
     void roundTrip_ShouldMaintainDataIntegrity() throws IOException {
-        // Given
         LocalDateTime now = LocalDateTime.now();
         ItemRequestDto originalRequest = ItemRequestDto.builder()
                 .id(1L)
@@ -90,11 +77,9 @@ class ItemRequestDtoJsonTest {
                 .created(now)
                 .build();
 
-        // When
         String json = objectMapper.writeValueAsString(originalRequest);
         ItemRequestDto deserializedRequest = objectMapper.readValue(json, ItemRequestDto.class);
 
-        // Then
         assertEquals(originalRequest.getId(), deserializedRequest.getId());
         assertEquals(originalRequest.getDescription(), deserializedRequest.getDescription());
         assertEquals(originalRequest.getRequesterId(), deserializedRequest.getRequesterId());

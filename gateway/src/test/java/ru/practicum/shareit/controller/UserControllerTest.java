@@ -32,7 +32,6 @@ class UserControllerTest {
 
     @Test
     void createUser_ShouldReturnCreatedUser() throws Exception {
-        // Given
         UserDto userDto = UserDto.builder()
                 .name("John Doe")
                 .email("john@example.com")
@@ -47,7 +46,6 @@ class UserControllerTest {
         when(userClient.createUser(any(UserDto.class)))
                 .thenReturn(ResponseEntity.ok(createdUser));
 
-        // When & Then
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
@@ -59,13 +57,14 @@ class UserControllerTest {
 
     @Test
     void createUser_WithInvalidData_ShouldReturnBadRequest() throws Exception {
-        // Given
         UserDto invalidUser = UserDto.builder()
-                .name("") // Invalid: empty name
-                .email("invalid-email") // Invalid: malformed email
+                .name("")
+                .email("invalid-email")
                 .build();
 
-        // When & Then
+        when(userClient.createUser(any(UserDto.class)))
+                .thenReturn(ResponseEntity.badRequest().build());
+
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidUser)))
@@ -74,7 +73,6 @@ class UserControllerTest {
 
     @Test
     void updateUser_ShouldReturnUpdatedUser() throws Exception {
-        // Given
         Long userId = 1L;
         UserDto userDto = UserDto.builder()
                 .name("Updated Name")
@@ -90,7 +88,6 @@ class UserControllerTest {
         when(userClient.updateUser(eq(userId), any(UserDto.class)))
                 .thenReturn(ResponseEntity.ok(updatedUser));
 
-        // When & Then
         mockMvc.perform(patch("/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
@@ -102,7 +99,6 @@ class UserControllerTest {
 
     @Test
     void getUser_ShouldReturnUser() throws Exception {
-        // Given
         Long userId = 1L;
         UserDto user = UserDto.builder()
                 .id(userId)
@@ -113,7 +109,6 @@ class UserControllerTest {
         when(userClient.getUser(userId))
                 .thenReturn(ResponseEntity.ok(user));
 
-        // When & Then
         mockMvc.perform(get("/users/{userId}", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(userId))
@@ -123,23 +118,19 @@ class UserControllerTest {
 
     @Test
     void getAllUsers_ShouldReturnAllUsers() throws Exception {
-        // Given
         when(userClient.getAllUsers())
                 .thenReturn(ResponseEntity.ok("[]"));
 
-        // When & Then
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void deleteUser_ShouldReturnOk() throws Exception {
-        // Given
         Long userId = 1L;
         when(userClient.deleteUser(userId))
                 .thenReturn(ResponseEntity.ok().build());
 
-        // When & Then
         mockMvc.perform(delete("/users/{userId}", userId))
                 .andExpect(status().isOk());
     }

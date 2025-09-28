@@ -4,9 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import ru.practicum.shareit.dto.ItemRequestDto;
-
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -18,73 +17,71 @@ class ItemRequestClientTest {
 
     @Test
     void createRequest_ShouldCallPostWithCorrectParameters() {
-        Long userId = 1L;
+        RestTemplate rest = mock(RestTemplate.class);
         ItemRequestDto requestDto = ItemRequestDto.builder()
                 .description("Need a drill")
                 .build();
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("created");
 
-        ItemRequestClient spyClient = spy(new ItemRequestClient("http://localhost:8080"));
-        doReturn(expectedResponse).when(spyClient).post(eq("/requests"), eq(requestDto), eq(userId));
+        ItemRequestClient spyClient = spy(new ItemRequestClient(rest, "http://localhost:8080"));
+        doReturn(expectedResponse).when(spyClient).post(eq("/requests"), eq(requestDto), eq(1L));
 
-        ResponseEntity<Object> result = spyClient.createRequest(userId, requestDto);
+        ResponseEntity<Object> result = spyClient.createRequest(1L, requestDto);
 
         assertEquals(expectedResponse, result);
-        verify(spyClient).post("/requests", requestDto, userId);
+        verify(spyClient).post("/requests", requestDto, 1L);
     }
 
     @Test
     void getUserRequests_ShouldCallGetWithCorrectParameters() {
-        Long userId = 1L;
+        RestTemplate rest = mock(RestTemplate.class);
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("requests");
 
-        ItemRequestClient spyClient = spy(new ItemRequestClient("http://localhost:8080"));
-        doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(userId));
+        ItemRequestClient spyClient = spy(new ItemRequestClient(rest, "http://localhost:8080"));
+        doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(1L));
 
-        ResponseEntity<Object> result = spyClient.getUserRequests(userId);
+        ResponseEntity<Object> result = spyClient.getUserRequests(1L);
 
         assertEquals(expectedResponse, result);
-        verify(spyClient).get("/requests", null, userId);
+        verify(spyClient).get("/requests", null, 1L);
     }
 
     @Test
     void getAllRequests_ShouldCallGetWithCorrectParameters() {
-        Long userId = 1L;
+        RestTemplate rest = mock(RestTemplate.class);
         int from = 0;
         int size = 10;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("all requests");
 
-        ItemRequestClient spyClient = spy(new ItemRequestClient("http://localhost:8080"));
-        doReturn(expectedResponse).when(spyClient).get(anyString(), any(Map.class), eq(userId));
+        ItemRequestClient spyClient = spy(new ItemRequestClient(rest, "http://localhost:8080"));
+        doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(1L));
 
-        ResponseEntity<Object> result = spyClient.getAllRequests(userId, from, size);
+        ResponseEntity<Object> result = spyClient.getAllRequests(1L, from, size);
 
         assertEquals(expectedResponse, result);
-        verify(spyClient).get(eq("/requests/all"), argThat(params -> {
-            Map<String, Object> paramsMap = params;
-            return paramsMap.get("from").equals(from) && paramsMap.get("size").equals(size);
-        }), eq(userId));
+        verify(spyClient).get(eq("/requests/all?from=" + from + "&size=" + size), isNull(), eq(1L));
     }
 
     @Test
     void getRequest_ShouldCallGetWithCorrectParameters() {
-        Long userId = 1L;
+        RestTemplate rest = mock(RestTemplate.class);
         Long requestId = 2L;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("request");
 
-        ItemRequestClient spyClient = spy(new ItemRequestClient("http://localhost:8080"));
-        doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(userId));
+        ItemRequestClient spyClient = spy(new ItemRequestClient(rest, "http://localhost:8080"));
+        doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(1L));
 
-        ResponseEntity<Object> result = spyClient.getRequest(userId, requestId);
+        ResponseEntity<Object> result = spyClient.getRequest(1L, requestId);
 
         assertEquals(expectedResponse, result);
-        verify(spyClient).get("/requests/" + requestId, null, userId);
+        verify(spyClient).get("/requests/" + requestId, null, 1L);
     }
 
     @Test
     void constructor_ShouldCreateClientWithCorrectServerUrl() {
+        RestTemplate rest = mock(RestTemplate.class);
         String serverUrl = "http://test-server:8080";
-        ItemRequestClient client = new ItemRequestClient(serverUrl);
+        ItemRequestClient client = new ItemRequestClient(rest, serverUrl);
 
         assertNotNull(client);
     }

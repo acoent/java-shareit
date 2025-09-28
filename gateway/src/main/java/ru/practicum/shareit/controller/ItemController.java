@@ -3,8 +3,8 @@ package ru.practicum.shareit.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.client.ItemClient;
-import ru.practicum.shareit.dto.ItemDto;
 import ru.practicum.shareit.common.HeaderConstants;
+import ru.practicum.shareit.dto.ItemDto;
 
 import java.util.Map;
 

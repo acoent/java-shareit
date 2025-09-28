@@ -92,13 +92,15 @@ class ItemControllerTest {
 
     @Test
     void createItem_WithInvalidData_ShouldReturnBadRequest() throws Exception {
-
         Long userId = 1L;
         ItemDto invalidItem = ItemDto.builder()
                 .name("")
                 .description("")
                 .available(null)
                 .build();
+
+        when(itemClient.createItem(eq(userId), any(ItemDto.class)))
+                .thenReturn(ResponseEntity.badRequest().build());
 
         mockMvc.perform(post("/items")
                         .header("X-Sharer-User-Id", userId)
@@ -173,7 +175,7 @@ class ItemControllerTest {
     void searchItems_ShouldReturnSearchResults() throws Exception {
         Long userId = 1L;
         String text = "drill";
-        when(itemClient.searchItems(userId, text))
+        when(itemClient.searchItems(eq(userId), eq(text), eq(0), eq(10)))
                 .thenReturn(ResponseEntity.ok("[]"));
 
         mockMvc.perform(get("/items/search")

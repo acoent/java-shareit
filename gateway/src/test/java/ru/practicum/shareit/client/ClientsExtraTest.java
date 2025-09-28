@@ -12,7 +12,6 @@ import ru.practicum.shareit.dto.ItemRequestDto;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -35,8 +34,7 @@ class ClientsExtraTest {
         RestTemplate rest = mock(RestTemplate.class);
         when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
-        ItemClient client = new ItemClient("http://s");
-        injectMockRest(client, rest);
+        ItemClient client = new ItemClient(rest, "http://s");
         ItemDto dto = ItemDto.builder().name("n").description("d").available(true).build();
         client.updateItem(11L, 22L, dto);
         verify(rest).exchange(eq("http://s/items/22"), eq(HttpMethod.PATCH), any(HttpEntity.class), eq(Object.class));
@@ -51,10 +49,9 @@ class ClientsExtraTest {
         RestTemplate rest = mock(RestTemplate.class);
         when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class), anyMap()))
                 .thenReturn(ResponseEntity.ok().build());
-        ItemRequestClient client = new ItemRequestClient("http://s");
-        injectMockRest(client, rest);
+        ItemRequestClient client = new ItemRequestClient(rest, "http://s");
         client.getAllRequests(5L, 1, 20);
-        verify(rest).exchange(eq("http://s/requests/all"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class), eq(Map.of("from", 1, "size", 20)));
+        verify(rest).exchange(eq("http://s/requests/all?from=1&size=20"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class));
         when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
         ItemRequestDto dto = ItemRequestDto.builder().description("desc").created(LocalDateTime.now()).build();

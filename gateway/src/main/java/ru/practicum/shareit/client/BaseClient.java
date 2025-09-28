@@ -11,12 +11,17 @@ import ru.practicum.shareit.common.HeaderConstants;
 import java.util.Map;
 
 public abstract class BaseClient {
-    protected final RestTemplate rest;
     protected final String serverUrl;
     private final ObjectMapper mapper = new ObjectMapper();
+    protected RestTemplate rest;
 
     public BaseClient(RestTemplate rest, @Value("${shareit.server.url}") String serverUrl) {
         this.rest = rest;
+        this.serverUrl = serverUrl;
+    }
+
+    public BaseClient(String serverUrl) {
+        this.rest = new RestTemplate();
         this.serverUrl = serverUrl;
     }
 
@@ -40,7 +45,6 @@ public abstract class BaseClient {
         return makeAndSendRequest(HttpMethod.DELETE, path, null, null);
     }
 
-    // версии с userId (X-Sharer-User-Id header)
     protected ResponseEntity<Object> get(String path, Map<String, Object> parameters, Long userId) {
         return makeAndSendRequest(HttpMethod.GET, path, parameters, null, userId);
     }
@@ -61,22 +65,19 @@ public abstract class BaseClient {
         return makeAndSendRequest(HttpMethod.DELETE, path, null, null, userId);
     }
 
-    // общая реализация
-    private ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
-                                                      Map<String, Object> parameters, Object body) {
+    protected ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
+                                                        Map<String, Object> parameters, Object body) {
         return makeAndSendRequest(method, path, parameters, body, null);
     }
 
-    private ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
-                                                      Map<String, Object> parameters, Object body, Long userId) {
+    protected ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
+                                                        Map<String, Object> parameters, Object body, Long userId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         if (userId != null) {
             headers.set(HeaderConstants.X_SHARER_USER_ID, userId.toString());
         }
-
         HttpEntity<Object> requestEntity = new HttpEntity<>(body, headers);
-
         try {
             ResponseEntity<Object> shareItServerResponse;
             if (parameters != null) {
@@ -86,7 +87,6 @@ public abstract class BaseClient {
             }
             return shareItServerResponse;
         } catch (HttpStatusCodeException ex) {
-            // Проксируем код и тело ответа от server
             String respBody = ex.getResponseBodyAsString();
             Object bodyObj;
             if (respBody == null || respBody.isBlank()) {
