@@ -3,15 +3,14 @@ package ru.practicum.shareit.client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import ru.practicum.shareit.dto.ItemRequestDto;
-
-import java.util.Map;
 
 @Service
 public class ItemRequestClient extends BaseClient {
 
-    public ItemRequestClient(@Value("${shareit.server.url}") String serverUrl) {
-        super(new org.springframework.web.client.RestTemplate(), serverUrl);
+    public ItemRequestClient(RestTemplate restTemplate, @Value("${shareit.server.url}") String serverUrl) {
+        super(restTemplate, serverUrl);
     }
 
     public ResponseEntity<Object> createRequest(Long userId, ItemRequestDto requestDto) {
@@ -23,8 +22,8 @@ public class ItemRequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAllRequests(Long userId, int from, int size) {
-        Map<String, Object> parameters = Map.of("from", from, "size", size);
-        return get("/requests/all", parameters, userId);
+        String path = "/requests/all?from=" + from + "&size=" + size;
+        return get(path, null, userId);
     }
 
     public ResponseEntity<Object> getRequest(Long userId, Long requestId) {

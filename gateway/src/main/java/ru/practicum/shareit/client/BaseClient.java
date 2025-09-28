@@ -1,14 +1,19 @@
 package ru.practicum.shareit.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import ru.practicum.shareit.common.HeaderConstants;
 
 import java.util.Map;
 
 public abstract class BaseClient {
     protected final RestTemplate rest;
     protected final String serverUrl;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public BaseClient(RestTemplate rest, @Value("${shareit.server.url}") String serverUrl) {
         this.rest = rest;
@@ -35,23 +40,7 @@ public abstract class BaseClient {
         return makeAndSendRequest(HttpMethod.DELETE, path, null, null);
     }
 
-    private ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Map<String, Object> parameters, Object body) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Object> requestEntity = new HttpEntity<>(body, headers);
-
-        ResponseEntity<Object> shareItServerResponse;
-
-        if (parameters != null) {
-            shareItServerResponse = rest.exchange(serverUrl + path, method, requestEntity, Object.class, parameters);
-        } else {
-            shareItServerResponse = rest.exchange(serverUrl + path, method, requestEntity, Object.class);
-        }
-
-        return shareItServerResponse;
-    }
-
+    // версии с userId (X-Sharer-User-Id header)
     protected ResponseEntity<Object> get(String path, Map<String, Object> parameters, Long userId) {
         return makeAndSendRequest(HttpMethod.GET, path, parameters, null, userId);
     }
@@ -72,23 +61,58 @@ public abstract class BaseClient {
         return makeAndSendRequest(HttpMethod.DELETE, path, null, null, userId);
     }
 
-    private ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Map<String, Object> parameters, Object body, Long userId) {
+    // общая реализация
+    private ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
+                                                      Map<String, Object> parameters, Object body) {
+        return makeAndSendRequest(method, path, parameters, body, null);
+    }
+
+    private ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
+                                                      Map<String, Object> parameters, Object body, Long userId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         if (userId != null) {
-            headers.set("X-Sharer-User-Id", userId.toString());
+            headers.set(HeaderConstants.X_SHARER_USER_ID, userId.toString());
         }
 
         HttpEntity<Object> requestEntity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Object> shareItServerResponse;
-
-        if (parameters != null) {
-            shareItServerResponse = rest.exchange(serverUrl + path, method, requestEntity, Object.class, parameters);
-        } else {
-            shareItServerResponse = rest.exchange(serverUrl + path, method, requestEntity, Object.class);
+        try {
+            ResponseEntity<Object> shareItServerResponse;
+            if (parameters != null) {
+                shareItServerResponse = rest.exchange(serverUrl + path, method, requestEntity, Object.class, parameters);
+            } else {
+                shareItServerResponse = rest.exchange(serverUrl + path, method, requestEntity, Object.class);
+            }
+            return shareItServerResponse;
+        } catch (HttpStatusCodeException ex) {
+            // Проксируем код и тело ответа от server
+            String respBody = ex.getResponseBodyAsString();
+            Object bodyObj;
+            if (respBody == null || respBody.isBlank()) {
+                bodyObj = Map.of("error", "Empty response from upstream server");
+            } else {
+                try {
+                    bodyObj = mapper.readValue(respBody, Object.class);
+                } catch (Exception parseEx) {
+                    bodyObj = respBody;
+                }
+            }
+            return ResponseEntity.status(ex.getStatusCode()).body(bodyObj);
+        } catch (ResourceAccessException ex) {
+            Map<String, Object> err = Map.of(
+                    "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    "error", "Internal Server Error",
+                    "message", ex.getMessage()
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+        } catch (Exception ex) {
+            Map<String, Object> err = Map.of(
+                    "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    "error", "Internal Server Error",
+                    "message", ex.getMessage()
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
         }
-
-        return shareItServerResponse;
     }
 }

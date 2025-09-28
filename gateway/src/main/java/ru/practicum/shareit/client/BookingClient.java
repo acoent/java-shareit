@@ -3,15 +3,14 @@ package ru.practicum.shareit.client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import ru.practicum.shareit.dto.BookingDto;
-
-import java.util.Map;
 
 @Service
 public class BookingClient extends BaseClient {
 
-    public BookingClient(@Value("${shareit.server.url}") String serverUrl) {
-        super(new org.springframework.web.client.RestTemplate(), serverUrl);
+    public BookingClient(RestTemplate restTemplate, @Value("${shareit.server.url}") String serverUrl) {
+        super(restTemplate, serverUrl);
     }
 
     public ResponseEntity<Object> createBooking(Long userId, BookingDto bookingDto) {
@@ -19,21 +18,21 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> updateBooking(Long userId, Long bookingId, Boolean approved) {
-        Map<String, Object> body = Map.of("approved", approved);
-        return patch("/bookings/" + bookingId, body, userId);
+        String path = "/bookings/" + bookingId + "?approved=" + approved;
+        return patch(path, null, userId);
     }
 
     public ResponseEntity<Object> getBooking(Long userId, Long bookingId) {
         return get("/bookings/" + bookingId, null, userId);
     }
 
-    public ResponseEntity<Object> getUserBookings(Long userId, String state) {
-        Map<String, Object> parameters = Map.of("state", state);
-        return get("/bookings", parameters, userId);
+    public ResponseEntity<Object> getUserBookings(Long userId, String state, int from, int size) {
+        String path = "/bookings?state=" + state + "&from=" + from + "&size=" + size;
+        return get(path, null, userId);
     }
 
-    public ResponseEntity<Object> getOwnerBookings(Long userId, String state) {
-        Map<String, Object> parameters = Map.of("state", state);
-        return get("/bookings/owner", parameters, userId);
+    public ResponseEntity<Object> getOwnerBookings(Long userId, String state, int from, int size) {
+        String path = "/bookings/owner?state=" + state + "&from=" + from + "&size=" + size;
+        return get(path, null, userId);
     }
 }

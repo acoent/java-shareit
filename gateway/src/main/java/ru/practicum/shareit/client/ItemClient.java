@@ -3,15 +3,14 @@ package ru.practicum.shareit.client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import ru.practicum.shareit.dto.ItemDto;
-
-import java.util.Map;
 
 @Service
 public class ItemClient extends BaseClient {
 
-    public ItemClient(@Value("${shareit.server.url}") String serverUrl) {
-        super(new org.springframework.web.client.RestTemplate(), serverUrl);
+    public ItemClient(RestTemplate restTemplate, @Value("${shareit.server.url}") String serverUrl) {
+        super(restTemplate, serverUrl);
     }
 
     public ResponseEntity<Object> createItem(Long userId, ItemDto itemDto) {
@@ -30,12 +29,17 @@ public class ItemClient extends BaseClient {
         return get("/items", null, userId);
     }
 
-    public ResponseEntity<Object> searchItems(Long userId, String text) {
-        Map<String, Object> parameters = Map.of("text", text);
-        return get("/items/search", parameters, userId);
+    public ResponseEntity<Object> searchItems(Long userId, String text, int from, int size) {
+        String safeText = text == null ? "" : text;
+        String path = "/items/search?text=" + safeText + "&from=" + from + "&size=" + size;
+        return get(path, null, userId);
     }
 
     public ResponseEntity<Object> deleteItem(Long userId, Long itemId) {
         return delete("/items/" + itemId, userId);
+    }
+
+    public ResponseEntity<Object> createComment(Long userId, Long itemId, Object comment) {
+        return post("/items/" + itemId + "/comment", comment, userId);
     }
 }

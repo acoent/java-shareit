@@ -1,17 +1,15 @@
 package ru.practicum.shareit.controller;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.client.ItemClient;
 import ru.practicum.shareit.dto.ItemDto;
+import ru.practicum.shareit.common.HeaderConstants;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/items")
-@Validated
 public class ItemController {
     private final ItemClient itemClient;
 
@@ -20,40 +18,47 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                             @RequestBody @Valid ItemDto itemDto) {
+    public ResponseEntity<Object> createItem(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
+                                             @RequestBody ItemDto itemDto) {
         return itemClient.createItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<Object> updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> updateItem(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                              @PathVariable Long itemId,
-                                             @RequestBody @Valid ItemDto itemDto) {
+                                             @RequestBody ItemDto itemDto) {
         return itemClient.updateItem(userId, itemId, itemDto);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<Object> getItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> getItem(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                           @PathVariable Long itemId) {
         return itemClient.getItem(userId, itemId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getUserItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Object> getUserItems(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId) {
         return itemClient.getUserItems(userId);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> searchItems(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> searchItems(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                               @RequestParam String text,
-                                              @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                              @RequestParam(defaultValue = "10") @Positive int size) {
-        return itemClient.searchItems(userId, text);
+                                              @RequestParam(defaultValue = "0") int from,
+                                              @RequestParam(defaultValue = "10") int size) {
+        return itemClient.searchItems(userId, text, from, size);
     }
 
     @DeleteMapping("/{itemId}")
-    public ResponseEntity<Object> deleteItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> deleteItem(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                              @PathVariable Long itemId) {
         return itemClient.deleteItem(userId, itemId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public ResponseEntity<Object> createComment(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
+                                                @PathVariable Long itemId,
+                                                @RequestBody Map<String, Object> comment) {
+        return itemClient.createComment(userId, itemId, comment);
     }
 }

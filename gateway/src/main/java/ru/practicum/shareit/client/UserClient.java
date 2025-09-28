@@ -3,13 +3,14 @@ package ru.practicum.shareit.client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import ru.practicum.shareit.dto.UserDto;
 
 @Service
 public class UserClient extends BaseClient {
 
-    public UserClient(@Value("${shareit.server.url}") String serverUrl) {
-        super(new org.springframework.web.client.RestTemplate(), serverUrl);
+    public UserClient(RestTemplate restTemplate, @Value("${shareit.server.url}") String serverUrl) {
+        super(restTemplate, serverUrl);
     }
 
     public ResponseEntity<Object> createUser(UserDto userDto) {
