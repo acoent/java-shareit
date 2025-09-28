@@ -32,7 +32,6 @@ class ItemControllerTest {
 
     @Test
     void createItem_ShouldReturnCreatedItem() throws Exception {
-        // Given
         Long userId = 1L;
         ItemDto itemDto = ItemDto.builder()
                 .name("Drill")
@@ -50,7 +49,6 @@ class ItemControllerTest {
         when(itemClient.createItem(eq(userId), any(ItemDto.class)))
                 .thenReturn(ResponseEntity.ok(createdItem));
 
-        // When & Then
         mockMvc.perform(post("/items")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -64,7 +62,6 @@ class ItemControllerTest {
 
     @Test
     void createItem_WithRequestId_ShouldReturnCreatedItemWithRequestId() throws Exception {
-        // Given
         Long userId = 1L;
         ItemDto itemDto = ItemDto.builder()
                 .name("Drill")
@@ -84,7 +81,6 @@ class ItemControllerTest {
         when(itemClient.createItem(eq(userId), any(ItemDto.class)))
                 .thenReturn(ResponseEntity.ok(createdItem));
 
-        // When & Then
         mockMvc.perform(post("/items")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -96,15 +92,14 @@ class ItemControllerTest {
 
     @Test
     void createItem_WithInvalidData_ShouldReturnBadRequest() throws Exception {
-        // Given
+
         Long userId = 1L;
         ItemDto invalidItem = ItemDto.builder()
-                .name("") // Invalid: empty name
-                .description("") // Invalid: empty description
-                .available(null) // Invalid: null available
+                .name("")
+                .description("")
+                .available(null)
                 .build();
 
-        // When & Then
         mockMvc.perform(post("/items")
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +109,6 @@ class ItemControllerTest {
 
     @Test
     void updateItem_ShouldReturnUpdatedItem() throws Exception {
-        // Given
         Long userId = 1L;
         Long itemId = 1L;
         ItemDto itemDto = ItemDto.builder()
@@ -133,7 +127,6 @@ class ItemControllerTest {
         when(itemClient.updateItem(eq(userId), eq(itemId), any(ItemDto.class)))
                 .thenReturn(ResponseEntity.ok(updatedItem));
 
-        // When & Then
         mockMvc.perform(patch("/items/{itemId}", itemId)
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -146,7 +139,6 @@ class ItemControllerTest {
 
     @Test
     void getItem_ShouldReturnItem() throws Exception {
-        // Given
         Long userId = 1L;
         Long itemId = 1L;
         ItemDto item = ItemDto.builder()
@@ -159,7 +151,6 @@ class ItemControllerTest {
         when(itemClient.getItem(userId, itemId))
                 .thenReturn(ResponseEntity.ok(item));
 
-        // When & Then
         mockMvc.perform(get("/items/{itemId}", itemId)
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk())
@@ -169,12 +160,10 @@ class ItemControllerTest {
 
     @Test
     void getUserItems_ShouldReturnUserItems() throws Exception {
-        // Given
         Long userId = 1L;
         when(itemClient.getUserItems(userId))
                 .thenReturn(ResponseEntity.ok("[]"));
 
-        // When & Then
         mockMvc.perform(get("/items")
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
@@ -182,13 +171,11 @@ class ItemControllerTest {
 
     @Test
     void searchItems_ShouldReturnSearchResults() throws Exception {
-        // Given
         Long userId = 1L;
         String text = "drill";
         when(itemClient.searchItems(userId, text))
                 .thenReturn(ResponseEntity.ok("[]"));
 
-        // When & Then
         mockMvc.perform(get("/items/search")
                         .header("X-Sharer-User-Id", userId)
                         .param("text", text)
@@ -199,13 +186,11 @@ class ItemControllerTest {
 
     @Test
     void deleteItem_ShouldReturnOk() throws Exception {
-        // Given
         Long userId = 1L;
         Long itemId = 1L;
         when(itemClient.deleteItem(userId, itemId))
                 .thenReturn(ResponseEntity.ok().build());
 
-        // When & Then
         mockMvc.perform(delete("/items/{itemId}", itemId)
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
