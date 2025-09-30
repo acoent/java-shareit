@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.client.ItemRequestClient;
+import ru.practicum.shareit.common.HeaderConstants;
 import ru.practicum.shareit.dto.ItemRequestDto;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -48,7 +49,7 @@ class ItemRequestControllerTest {
                 .thenReturn(ResponseEntity.ok(createdRequest));
 
         mockMvc.perform(post("/requests")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
@@ -68,7 +69,7 @@ class ItemRequestControllerTest {
                 .thenReturn(ResponseEntity.badRequest().build());
 
         mockMvc.perform(post("/requests")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -81,7 +82,7 @@ class ItemRequestControllerTest {
                 .thenReturn(ResponseEntity.ok("[]"));
 
         mockMvc.perform(get("/requests")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId))
                 .andExpect(status().isOk());
     }
 
@@ -92,7 +93,7 @@ class ItemRequestControllerTest {
                 .thenReturn(ResponseEntity.ok("[]"));
 
         mockMvc.perform(get("/requests/all")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId)
                         .param("from", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk());
@@ -112,7 +113,7 @@ class ItemRequestControllerTest {
                 .thenReturn(ResponseEntity.ok(request));
 
         mockMvc.perform(get("/requests/{requestId}", requestId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(requestId))
                 .andExpect(jsonPath("$.description").value("Need a drill"));

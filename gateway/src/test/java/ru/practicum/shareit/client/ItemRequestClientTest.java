@@ -23,7 +23,7 @@ class ItemRequestClientTest {
                 .build();
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("created");
 
-        ItemRequestClient spyClient = spy(new ItemRequestClient(rest, "http://localhost:8080"));
+        ItemRequestClient spyClient = spy(new ItemRequestClient(rest));
         doReturn(expectedResponse).when(spyClient).post(eq("/requests"), eq(requestDto), eq(1L));
 
         ResponseEntity<Object> result = spyClient.createRequest(1L, requestDto);
@@ -37,7 +37,7 @@ class ItemRequestClientTest {
         RestTemplate rest = mock(RestTemplate.class);
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("requests");
 
-        ItemRequestClient spyClient = spy(new ItemRequestClient(rest, "http://localhost:8080"));
+        ItemRequestClient spyClient = spy(new ItemRequestClient(rest));
         doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(1L));
 
         ResponseEntity<Object> result = spyClient.getUserRequests(1L);
@@ -53,7 +53,7 @@ class ItemRequestClientTest {
         int size = 10;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("all requests");
 
-        ItemRequestClient spyClient = spy(new ItemRequestClient(rest, "http://localhost:8080"));
+        ItemRequestClient spyClient = spy(new ItemRequestClient(rest));
         doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(1L));
 
         ResponseEntity<Object> result = spyClient.getAllRequests(1L, from, size);
@@ -68,7 +68,7 @@ class ItemRequestClientTest {
         Long requestId = 2L;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("request");
 
-        ItemRequestClient spyClient = spy(new ItemRequestClient(rest, "http://localhost:8080"));
+        ItemRequestClient spyClient = spy(new ItemRequestClient(rest));
         doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(1L));
 
         ResponseEntity<Object> result = spyClient.getRequest(1L, requestId);
@@ -81,7 +81,7 @@ class ItemRequestClientTest {
     void constructor_ShouldCreateClientWithCorrectServerUrl() {
         RestTemplate rest = mock(RestTemplate.class);
         String serverUrl = "http://test-server:8080";
-        ItemRequestClient client = new ItemRequestClient(rest, serverUrl);
+        ItemRequestClient client = new ItemRequestClient(rest);
 
         assertNotNull(client);
     }

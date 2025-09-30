@@ -20,7 +20,7 @@ class BookingClientNullApprovedTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         rest = mock(RestTemplate.class);
-        bookingClient = new BookingClient(rest, "http://server");
+        bookingClient = new BookingClient(rest);
     }
 
     @Test
@@ -30,7 +30,7 @@ class BookingClientNullApprovedTest {
 
         bookingClient.updateBooking(11L, 22L, null);
 
-        verify(rest).exchange(eq("http://server/bookings/22?approved=null"), eq(HttpMethod.PATCH), any(HttpEntity.class), eq(Object.class));
+        verify(rest).exchange(eq("/bookings/22?approved=null"), eq(HttpMethod.PATCH), any(HttpEntity.class), eq(Object.class));
     }
 
     @Test
@@ -40,6 +40,6 @@ class BookingClientNullApprovedTest {
 
         bookingClient.getUserBookings(3L, "REJECTED", 5, 50);
 
-        verify(rest).exchange(eq("http://server/bookings?state=REJECTED&from=5&size=50"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class));
+        verify(rest).exchange(eq("/bookings?state=REJECTED&from=5&size=50"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class));
     }
 }

@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 import ru.practicum.shareit.dto.ItemDto;
 import ru.practicum.shareit.dto.ItemRequestDto;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -23,39 +22,32 @@ class ClientsExtraTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    private void injectMockRest(Object clientInstance, RestTemplate restMock) throws Exception {
-        Field f = BaseClient.class.getDeclaredField("rest");
-        f.setAccessible(true);
-        f.set(clientInstance, restMock);
-    }
-
     @Test
-    void itemClient_updateAndGetAndDelete() throws Exception {
+    void itemClient_updateAndGetAndDelete() {
         RestTemplate rest = mock(RestTemplate.class);
         when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
-        ItemClient client = new ItemClient(rest, "http://s");
+        ItemClient client = new ItemClient(rest);
         ItemDto dto = ItemDto.builder().name("n").description("d").available(true).build();
         client.updateItem(11L, 22L, dto);
-        verify(rest).exchange(eq("http://s/items/22"), eq(HttpMethod.PATCH), any(HttpEntity.class), eq(Object.class));
+        verify(rest).exchange(eq("/items/22"), eq(HttpMethod.PATCH), any(HttpEntity.class), eq(Object.class));
         client.getItem(11L, 22L);
-        verify(rest).exchange(eq("http://s/items/22"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class));
+        verify(rest).exchange(eq("/items/22"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class));
         client.deleteItem(11L, 22L);
-        verify(rest).exchange(eq("http://s/items/22"), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Object.class));
+        verify(rest).exchange(eq("/items/22"), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Object.class));
     }
 
     @Test
-    void itemRequestClient_getAndCreate() throws Exception {
+    void itemRequestClient_getAndCreate() {
         RestTemplate rest = mock(RestTemplate.class);
-        when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class), anyMap()))
-                .thenReturn(ResponseEntity.ok().build());
-        ItemRequestClient client = new ItemRequestClient(rest, "http://s");
-        client.getAllRequests(5L, 1, 20);
-        verify(rest).exchange(eq("http://s/requests/all?from=1&size=20"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class));
         when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
+        ItemRequestClient client = new ItemRequestClient(rest);
+        client.getAllRequests(5L, 1, 20);
+        verify(rest).exchange(eq("/requests/all?from=1&size=20"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class));
+
         ItemRequestDto dto = ItemRequestDto.builder().description("desc").created(LocalDateTime.now()).build();
         client.createRequest(5L, dto);
-        verify(rest).exchange(eq("http://s/requests"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Object.class));
+        verify(rest).exchange(eq("/requests"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Object.class));
     }
 }

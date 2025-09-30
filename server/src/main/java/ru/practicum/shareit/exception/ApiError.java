@@ -1,4 +1,14 @@
 package ru.practicum.shareit.exception;
 
-public record ApiError(String code, String message) {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ApiError {
+    private String error;
 }

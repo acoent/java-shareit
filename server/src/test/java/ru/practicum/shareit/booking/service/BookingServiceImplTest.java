@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
@@ -29,10 +30,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceImplTest {
@@ -228,5 +227,171 @@ class BookingServiceImplTest {
     void getByOwner_UserNotFound_ThrowsNotFound() {
         when(userRepo.existsById(owner.getId())).thenReturn(false);
         assertThrows(NotFoundException.class, () -> bookingService.getByOwner(owner.getId(), "ALL", 0, 10));
+    }
+
+    @Test
+    void getByOwner_InvalidSize_ThrowsBadRequest() {
+        when(userRepo.existsById(owner.getId())).thenReturn(true);
+
+        assertThrows(BadRequestException.class, () -> bookingService.getByOwner(owner.getId(), "ALL", 0, 0));
+    }
+
+    @Test
+    void getByOwner_StateCurrent_ShouldReturnCurrentBookings() {
+        when(userRepo.existsById(owner.getId())).thenReturn(true);
+        Page<Booking> page = new PageImpl<>(List.of(booking));
+        when(bookingRepo.findByItem_Owner_IdAndStartBeforeAndEndAfterOrderByStartDesc(anyLong(), any(), any(), any(Pageable.class)))
+                .thenReturn(page);
+        when(bookingMapper.toResponseDto(any(Booking.class))).thenReturn(responseDto);
+
+        List<BookingResponseDto> result = bookingService.getByOwner(owner.getId(), "CURRENT", 0, 10);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void getByOwner_StatePast_ShouldReturnPastBookings() {
+        when(userRepo.existsById(owner.getId())).thenReturn(true);
+        Page<Booking> page = new PageImpl<>(List.of(booking));
+        when(bookingRepo.findByItem_Owner_IdAndEndBeforeOrderByStartDesc(anyLong(), any(), any(Pageable.class)))
+                .thenReturn(page);
+        when(bookingMapper.toResponseDto(any(Booking.class))).thenReturn(responseDto);
+
+        List<BookingResponseDto> result = bookingService.getByOwner(owner.getId(), "PAST", 0, 10);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void getByOwner_StateFuture_ShouldReturnFutureBookings() {
+        when(userRepo.existsById(owner.getId())).thenReturn(true);
+        Page<Booking> page = new PageImpl<>(List.of(booking));
+        when(bookingRepo.findByItem_Owner_IdAndStartAfterOrderByStartDesc(anyLong(), any(), any(Pageable.class)))
+                .thenReturn(page);
+        when(bookingMapper.toResponseDto(any(Booking.class))).thenReturn(responseDto);
+
+        List<BookingResponseDto> result = bookingService.getByOwner(owner.getId(), "FUTURE", 0, 10);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void getByOwner_StateWaiting_ShouldReturnWaitingBookings() {
+        when(userRepo.existsById(owner.getId())).thenReturn(true);
+        Page<Booking> page = new PageImpl<>(List.of(booking));
+        when(bookingRepo.findByItem_Owner_IdAndStatusOrderByStartDesc(anyLong(), eq(BookingStatus.WAITING), any(Pageable.class)))
+                .thenReturn(page);
+        when(bookingMapper.toResponseDto(any(Booking.class))).thenReturn(responseDto);
+
+        List<BookingResponseDto> result = bookingService.getByOwner(owner.getId(), "WAITING", 0, 10);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void getByOwner_StateRejected_ShouldReturnRejectedBookings() {
+        when(userRepo.existsById(owner.getId())).thenReturn(true);
+        Page<Booking> page = new PageImpl<>(List.of(booking));
+        when(bookingRepo.findByItem_Owner_IdAndStatusOrderByStartDesc(anyLong(), eq(BookingStatus.REJECTED), any(Pageable.class)))
+                .thenReturn(page);
+        when(bookingMapper.toResponseDto(any(Booking.class))).thenReturn(responseDto);
+
+        List<BookingResponseDto> result = bookingService.getByOwner(owner.getId(), "REJECTED", 0, 10);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void getByOwner_UnknownState_ShouldThrowBadRequestException() {
+        when(userRepo.existsById(owner.getId())).thenReturn(true);
+        assertThrows(BadRequestException.class, () -> bookingService.getByOwner(owner.getId(), "INVALID", 0, 10));
+    }
+
+    @Test
+    void create_WithNullDto_ShouldThrowBadRequestException() {
+        assertThrows(BadRequestException.class, () -> bookingService.create(1L, null));
+    }
+
+
+    @Test
+    void create_ItemNotFound_ShouldThrowNotFoundException() {
+        when(userRepo.findById(booker.getId())).thenReturn(Optional.of(booker));
+        when(itemRepo.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> bookingService.create(booker.getId(), bookingDto));
+    }
+
+    @Test
+    void getByBooker_NegativeFrom_ShouldSetToZero() {
+        when(userRepo.existsById(booker.getId())).thenReturn(true);
+        Page<Booking> page = new PageImpl<>(List.of(booking));
+        when(bookingRepo.findByBooker_IdOrderByStartDesc(anyLong(), any(PageRequest.class))).thenReturn(page);
+        when(bookingMapper.toResponseDto(any(Booking.class))).thenReturn(responseDto);
+
+        List<BookingResponseDto> result = bookingService.getByBooker(booker.getId(), "ALL", -5, 10);
+
+        assertNotNull(result);
+        verify(bookingRepo).findByBooker_IdOrderByStartDesc(eq(booker.getId()), any(PageRequest.class));
+    }
+
+    @Test
+    void getByBooker_StateNullOrBlank_ShouldReturnAllBookings() {
+        when(userRepo.existsById(booker.getId())).thenReturn(true);
+        Page<Booking> page = new PageImpl<>(List.of(booking));
+        when(bookingRepo.findByBooker_IdOrderByStartDesc(anyLong(), any(PageRequest.class))).thenReturn(page);
+        when(bookingMapper.toResponseDto(any(Booking.class))).thenReturn(responseDto);
+
+        List<BookingResponseDto> resultNull = bookingService.getByBooker(booker.getId(), null, 0, 10);
+        List<BookingResponseDto> resultBlank = bookingService.getByBooker(booker.getId(), "", 0, 10);
+
+        assertNotNull(resultNull);
+        assertNotNull(resultBlank);
+    }
+
+
+    @Test
+    void getById_BookingNotFound_ShouldThrowNotFoundException() {
+        when(bookingRepo.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> bookingService.getById(1L, 1L));
+    }
+
+    @Test
+    void getById_NotBookerOrOwner_ShouldThrowNotFoundException() {
+        when(bookingRepo.findById(1L)).thenReturn(Optional.of(booking));
+        assertThrows(NotFoundException.class, () -> bookingService.getById(999L, 1L));
+    }
+
+    @Test
+    void getById_ByBooker_ShouldReturnBooking() {
+        when(bookingRepo.findById(1L)).thenReturn(Optional.of(booking));
+        when(bookingMapper.toResponseDto(booking)).thenReturn(responseDto);
+
+        BookingResponseDto result = bookingService.getById(booker.getId(), 1L);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void getById_ByOwner_ShouldReturnBooking() {
+        when(bookingRepo.findById(1L)).thenReturn(Optional.of(booking));
+        when(bookingMapper.toResponseDto(booking)).thenReturn(responseDto);
+
+        BookingResponseDto result = bookingService.getById(owner.getId(), 1L);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void approve_BookingNotFound_ShouldThrowNotFoundException() {
+        when(bookingRepo.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> bookingService.approve(1L, 1L, true));
+    }
+
+    @Test
+    void approve_ItemIsNull_ShouldThrowNotFoundException() {
+        booking.setItem(null);
+        when(bookingRepo.findById(1L)).thenReturn(Optional.of(booking));
+
+        assertThrows(NotFoundException.class, () -> bookingService.approve(1L, 1L, true));
     }
 }

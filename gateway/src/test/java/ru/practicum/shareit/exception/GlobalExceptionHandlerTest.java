@@ -20,7 +20,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleValidationException_ShouldReturnBadRequestWithFieldErrors() {
+    void handleValidationException_ShouldReturnBadRequestWithFirstError() {
         Object target = new Object();
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(target, "target");
         bindingResult.addError(new FieldError("target", "field1", "Field1 is required"));
@@ -28,35 +28,11 @@ class GlobalExceptionHandlerTest {
 
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(null, bindingResult);
 
-        ResponseEntity<Object> response = exceptionHandler.handleValidationException(exception);
+        ResponseEntity<ApiError> response = exceptionHandler.handleValidationException(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertInstanceOf(ErrorResponse.class, response.getBody());
-
-        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
-        String errorMessage = errorResponse.getError();
-        assertTrue(errorMessage.contains("Field1 is required"));
-        assertTrue(errorMessage.contains("Field2 must be valid"));
-        assertTrue(errorMessage.contains(", "));
-    }
-
-    @Test
-    void handleValidationException_ShouldJoinMultipleErrorsWithComma() {
-        Object target = new Object();
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(target, "target");
-        bindingResult.addError(new FieldError("target", "name", "Name is required"));
-        bindingResult.addError(new FieldError("target", "email", "Email must be valid"));
-        bindingResult.addError(new FieldError("target", "age", "Age must be positive"));
-
-        MethodArgumentNotValidException exception = new MethodArgumentNotValidException(null, bindingResult);
-
-        ResponseEntity<Object> response = exceptionHandler.handleValidationException(exception);
-
-        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
-        String errorMessage = errorResponse.getError();
-
-        long commaCount = errorMessage.chars().filter(ch -> ch == ',').count();
-        assertEquals(2, commaCount);
+        assertNotNull(response.getBody());
+        assertEquals("Field1 is required", response.getBody().getError());
     }
 
     @Test
@@ -67,10 +43,9 @@ class GlobalExceptionHandlerTest {
 
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(null, bindingResult);
 
-        ResponseEntity<Object> response = exceptionHandler.handleValidationException(exception);
+        ResponseEntity<ApiError> response = exceptionHandler.handleValidationException(exception);
 
-        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
-        assertEquals("Name is required", errorResponse.getError());
+        assertEquals("Name is required", response.getBody().getError());
     }
 
     @Test
@@ -82,11 +57,7 @@ class GlobalExceptionHandlerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
-
-        ApiError apiError = response.getBody();
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, apiError.getStatus());
-        assertEquals("Internal Server Error", apiError.getError());
-        assertEquals(exceptionMessage, apiError.getMessage());
+        assertEquals(exceptionMessage, response.getBody().getError());
     }
 
     @Test
@@ -97,11 +68,7 @@ class GlobalExceptionHandlerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
-
-        ApiError apiError = response.getBody();
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, apiError.getStatus());
-        assertEquals("Internal Server Error", apiError.getError());
-        assertNull(apiError.getMessage());
+        assertEquals("Internal Server Error", response.getBody().getError());
     }
 
     @Test
@@ -111,21 +78,18 @@ class GlobalExceptionHandlerTest {
 
         ResponseEntity<ApiError> response = exceptionHandler.handleGenericException(exception);
 
-        ApiError apiError = response.getBody();
-        assertEquals(customMessage, apiError.getMessage());
+        assertEquals(customMessage, response.getBody().getError());
     }
 
     @Test
-    void handleValidationException_WithEmptyBindingResult_ShouldReturnEmptyErrorMessage() {
+    void handleValidationException_WithEmptyBindingResult_ShouldReturnDefaultMessage() {
         Object target = new Object();
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(target, "target");
 
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(null, bindingResult);
 
-        ResponseEntity<Object> response = exceptionHandler.handleValidationException(exception);
+        ResponseEntity<ApiError> response = exceptionHandler.handleValidationException(exception);
 
-        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
-        assertEquals("", errorResponse.getError());
+        assertEquals("Validation failed", response.getBody().getError());
     }
-
 }

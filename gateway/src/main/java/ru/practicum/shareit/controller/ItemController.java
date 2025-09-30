@@ -1,15 +1,17 @@
 package ru.practicum.shareit.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.client.ItemClient;
 import ru.practicum.shareit.common.HeaderConstants;
+import ru.practicum.shareit.dto.CommentDto;
 import ru.practicum.shareit.dto.ItemDto;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/items")
+@Validated
 public class ItemController {
     private final ItemClient itemClient;
 
@@ -19,7 +21,7 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<Object> createItem(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
-                                             @RequestBody ItemDto itemDto) {
+                                             @RequestBody @Valid ItemDto itemDto) {
         return itemClient.createItem(userId, itemDto);
     }
 
@@ -58,7 +60,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> createComment(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                                 @PathVariable Long itemId,
-                                                @RequestBody Map<String, Object> comment) {
-        return itemClient.createComment(userId, itemId, comment);
+                                                @RequestBody @Valid CommentDto dto) {
+        return itemClient.createComment(userId, itemId, dto);
     }
 }

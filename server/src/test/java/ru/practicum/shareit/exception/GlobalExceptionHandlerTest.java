@@ -38,8 +38,7 @@ class GlobalExceptionHandlerTest {
 
         mockMvc.perform(get("/users/999"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("User not found"))
-                .andExpect(jsonPath("$.code").value("NOT_FOUND"));
+                .andExpect(jsonPath("$.error").value("User not found"));
     }
 
     @Test
@@ -52,8 +51,7 @@ class GlobalExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Invalid data"))
-                .andExpect(jsonPath("$.code").value("BAD_REQUEST"));
+                .andExpect(jsonPath("$.error").value("Invalid data"));
     }
 
     @Test
@@ -66,8 +64,7 @@ class GlobalExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("Email already exists"))
-                .andExpect(jsonPath("$.code").value("CONFLICT"));
+                .andExpect(jsonPath("$.error").value("Email already exists"));
     }
 
     @Test
@@ -80,18 +77,15 @@ class GlobalExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("Access denied"))
-                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+                .andExpect(jsonPath("$.error").value("Access denied"));
     }
 
     @Test
-    void handleValidationException() throws Exception {
-        UserDto invalidDto = UserDto.builder().build();
+    void handleGenericException() throws Exception {
+        when(userService.getById(anyLong())).thenThrow(new RuntimeException("Unexpected error"));
 
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").exists());
+        mockMvc.perform(get("/users/1"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.error").value("Unexpected error"));
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.client.ItemClient;
+import ru.practicum.shareit.common.HeaderConstants;
 import ru.practicum.shareit.dto.ItemDto;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +51,7 @@ class ItemControllerTest {
                 .thenReturn(ResponseEntity.ok(createdItem));
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(itemDto)))
                 .andExpect(status().isOk())
@@ -82,7 +83,7 @@ class ItemControllerTest {
                 .thenReturn(ResponseEntity.ok(createdItem));
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(itemDto)))
                 .andExpect(status().isOk())
@@ -103,7 +104,7 @@ class ItemControllerTest {
                 .thenReturn(ResponseEntity.badRequest().build());
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidItem)))
                 .andExpect(status().isBadRequest());
@@ -130,7 +131,7 @@ class ItemControllerTest {
                 .thenReturn(ResponseEntity.ok(updatedItem));
 
         mockMvc.perform(patch("/items/{itemId}", itemId)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(itemDto)))
                 .andExpect(status().isOk())
@@ -154,7 +155,7 @@ class ItemControllerTest {
                 .thenReturn(ResponseEntity.ok(item));
 
         mockMvc.perform(get("/items/{itemId}", itemId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(itemId))
                 .andExpect(jsonPath("$.name").value("Drill"));
@@ -167,7 +168,7 @@ class ItemControllerTest {
                 .thenReturn(ResponseEntity.ok("[]"));
 
         mockMvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId))
                 .andExpect(status().isOk());
     }
 
@@ -179,7 +180,7 @@ class ItemControllerTest {
                 .thenReturn(ResponseEntity.ok("[]"));
 
         mockMvc.perform(get("/items/search")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId)
                         .param("text", text)
                         .param("from", "0")
                         .param("size", "10"))
@@ -194,7 +195,7 @@ class ItemControllerTest {
                 .thenReturn(ResponseEntity.ok().build());
 
         mockMvc.perform(delete("/items/{itemId}", itemId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HeaderConstants.X_SHARER_USER_ID, userId))
                 .andExpect(status().isOk());
     }
 }

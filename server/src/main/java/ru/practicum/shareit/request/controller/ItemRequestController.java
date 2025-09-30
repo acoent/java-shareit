@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request.controller;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ResponseEntity<ItemRequestDto> create(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
-                                                 @RequestBody @Valid ItemRequestDto dto) {
+                                                 @RequestBody ItemRequestDto dto) {
         return ResponseEntity.ok(service.create(userId, dto));
     }
 

@@ -1,7 +1,6 @@
 package ru.practicum.shareit.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
@@ -11,18 +10,11 @@ import ru.practicum.shareit.common.HeaderConstants;
 import java.util.Map;
 
 public abstract class BaseClient {
-    protected final String serverUrl;
     private final ObjectMapper mapper = new ObjectMapper();
     protected RestTemplate rest;
 
-    public BaseClient(RestTemplate rest, @Value("${shareit.server.url}") String serverUrl) {
+    public BaseClient(RestTemplate rest) {
         this.rest = rest;
-        this.serverUrl = serverUrl;
-    }
-
-    public BaseClient(String serverUrl) {
-        this.rest = new RestTemplate();
-        this.serverUrl = serverUrl;
     }
 
     protected ResponseEntity<Object> get(String path, Map<String, Object> parameters) {
@@ -77,13 +69,15 @@ public abstract class BaseClient {
         if (userId != null) {
             headers.set(HeaderConstants.X_SHARER_USER_ID, userId.toString());
         }
+
         HttpEntity<Object> requestEntity = new HttpEntity<>(body, headers);
+
         try {
             ResponseEntity<Object> shareItServerResponse;
             if (parameters != null) {
-                shareItServerResponse = rest.exchange(serverUrl + path, method, requestEntity, Object.class, parameters);
+                shareItServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
             } else {
-                shareItServerResponse = rest.exchange(serverUrl + path, method, requestEntity, Object.class);
+                shareItServerResponse = rest.exchange(path, method, requestEntity, Object.class);
             }
             return shareItServerResponse;
         } catch (HttpStatusCodeException ex) {

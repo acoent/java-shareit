@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.controller;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,7 @@ public class ItemController {
     @PostMapping
     public ResponseEntity<ItemDto> create(
             @RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
-            @RequestBody @Valid ItemDto dto
+            @RequestBody ItemDto dto
     ) {
         ItemDto created = service.create(userId, dto);
         return ResponseEntity.ok(created);
@@ -68,7 +67,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<CommentDto> addComment(@RequestHeader(HeaderConstants.X_SHARER_USER_ID) Long userId,
                                                  @PathVariable Long itemId,
-                                                 @RequestBody @Valid CommentDto dto) {
+                                                 @RequestBody CommentDto dto) {
         CommentDto created = service.addComment(userId, itemId, dto);
         return ResponseEntity.ok(created);
     }

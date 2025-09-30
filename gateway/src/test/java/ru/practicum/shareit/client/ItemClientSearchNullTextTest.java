@@ -7,6 +7,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import ru.practicum.shareit.dto.CommentDto;
 import ru.practicum.shareit.dto.ItemDto;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -21,7 +22,7 @@ class ItemClientSearchNullTextTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         rest = mock(RestTemplate.class);
-        itemClient = new ItemClient(rest, "http://server");
+        itemClient = new ItemClient(rest);
     }
 
     @Test
@@ -31,7 +32,7 @@ class ItemClientSearchNullTextTest {
 
         itemClient.searchItems(5L, null, 0, 10);
 
-        verify(rest).exchange(eq("http://server/items/search?text=&from=0&size=10"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class));
+        verify(rest).exchange(eq("/items/search?text=&from=0&size=10"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class));
     }
 
     @Test
@@ -41,12 +42,13 @@ class ItemClientSearchNullTextTest {
 
         ItemDto dto = ItemDto.builder().name("a").description("b").available(true).build();
         itemClient.createItem(2L, dto);
-        verify(rest).exchange(eq("http://server/items"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Object.class));
+        verify(rest).exchange(eq("/items"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Object.class));
 
-        itemClient.createComment(2L, 7L, java.util.Map.of("text", "ok"));
-        verify(rest).exchange(eq("http://server/items/7/comment"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Object.class));
+        CommentDto commentDto = CommentDto.builder().text("ok").build();
+        itemClient.createComment(2L, 7L, commentDto);
+        verify(rest).exchange(eq("/items/7/comment"), eq(HttpMethod.POST), any(HttpEntity.class), eq(Object.class));
 
         itemClient.deleteItem(2L, 7L);
-        verify(rest).exchange(eq("http://server/items/7"), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Object.class));
+        verify(rest).exchange(eq("/items/7"), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Object.class));
     }
 }

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.client;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -9,8 +8,8 @@ import ru.practicum.shareit.dto.BookingDto;
 @Service
 public class BookingClient extends BaseClient {
 
-    public BookingClient(RestTemplate restTemplate, @Value("${shareit.server.url}") String serverUrl) {
-        super(restTemplate, serverUrl);
+    public BookingClient(RestTemplate restTemplate) {
+        super(restTemplate);
     }
 
     public ResponseEntity<Object> createBooking(Long userId, BookingDto bookingDto) {

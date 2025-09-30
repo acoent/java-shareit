@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+import ru.practicum.shareit.common.HeaderConstants;
 
 import java.util.Map;
 
@@ -23,7 +24,7 @@ class BaseClientAllMethodsTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         rest = mock(RestTemplate.class);
-        client = new TestClient(rest, "http://server");
+        client = new TestClient(rest);
         httpEntityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
     }
 
@@ -32,10 +33,10 @@ class BaseClientAllMethodsTest {
         when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
         client.doPut("/p", Map.of("a", 1));
-        verify(rest).exchange(eq("http://server/p"), eq(HttpMethod.PUT), httpEntityCaptor.capture(), eq(Object.class));
+        verify(rest).exchange(eq("/p"), eq(HttpMethod.PUT), httpEntityCaptor.capture(), eq(Object.class));
         HttpHeaders h = httpEntityCaptor.getValue().getHeaders();
         assertThat(h.getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThat(h.containsKey("X-Sharer-User-Id")).isFalse();
+        assertThat(h.containsKey(HeaderConstants.X_SHARER_USER_ID)).isFalse();
     }
 
     @Test
@@ -43,8 +44,8 @@ class BaseClientAllMethodsTest {
         when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
         client.doPut("/p/1", Map.of("a", 2), 99L);
-        verify(rest).exchange(eq("http://server/p/1"), eq(HttpMethod.PUT), httpEntityCaptor.capture(), eq(Object.class));
-        assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("X-Sharer-User-Id")).isEqualTo("99");
+        verify(rest).exchange(eq("/p/1"), eq(HttpMethod.PUT), httpEntityCaptor.capture(), eq(Object.class));
+        assertThat(httpEntityCaptor.getValue().getHeaders().getFirst(HeaderConstants.X_SHARER_USER_ID)).isEqualTo("99");
     }
 
     @Test
@@ -52,8 +53,8 @@ class BaseClientAllMethodsTest {
         when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
         client.doPatch("/p/2", Map.of("k", "v"));
-        verify(rest).exchange(eq("http://server/p/2"), eq(HttpMethod.PATCH), httpEntityCaptor.capture(), eq(Object.class));
-        assertThat(httpEntityCaptor.getValue().getHeaders().containsKey("X-Sharer-User-Id")).isFalse();
+        verify(rest).exchange(eq("/p/2"), eq(HttpMethod.PATCH), httpEntityCaptor.capture(), eq(Object.class));
+        assertThat(httpEntityCaptor.getValue().getHeaders().containsKey(HeaderConstants.X_SHARER_USER_ID)).isFalse();
     }
 
     @Test
@@ -61,7 +62,7 @@ class BaseClientAllMethodsTest {
         when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.noContent().build());
         client.doDelete("/d/1");
-        verify(rest).exchange(eq("http://server/d/1"), eq(HttpMethod.DELETE), httpEntityCaptor.capture(), eq(Object.class));
+        verify(rest).exchange(eq("/d/1"), eq(HttpMethod.DELETE), httpEntityCaptor.capture(), eq(Object.class));
         assertThat(httpEntityCaptor.getValue().getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
     }
 
@@ -70,15 +71,15 @@ class BaseClientAllMethodsTest {
         when(rest.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class), anyMap()))
                 .thenReturn(ResponseEntity.ok().build());
         client.doGet("/g/{x}", Map.of("x", 5), 123L);
-        verify(rest).exchange(eq("http://server/g/{x}"), eq(HttpMethod.GET), httpEntityCaptor.capture(), eq(Object.class), eq(Map.of("x", 5)));
+        verify(rest).exchange(eq("/g/{x}"), eq(HttpMethod.GET), httpEntityCaptor.capture(), eq(Object.class), eq(Map.of("x", 5)));
         HttpHeaders h = httpEntityCaptor.getValue().getHeaders();
-        assertThat(h.getFirst("X-Sharer-User-Id")).isEqualTo("123");
+        assertThat(h.getFirst(HeaderConstants.X_SHARER_USER_ID)).isEqualTo("123");
         assertThat(h.getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
     }
 
     static class TestClient extends BaseClient {
-        public TestClient(RestTemplate rest, String serverUrl) {
-            super(rest, serverUrl);
+        public TestClient(RestTemplate rest) {
+            super(rest);
         }
 
         public ResponseEntity<Object> doPut(String path, Object body) {

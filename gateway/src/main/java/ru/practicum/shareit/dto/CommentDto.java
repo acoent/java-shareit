@@ -1,5 +1,6 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -11,9 +12,12 @@ import java.time.LocalDateTime;
 @Builder
 public class CommentDto {
     private Long id;
-    private Long itemId;
-    private Long authorId;
+
+    @NotBlank(message = "text must be provided")
     private String text;
+
+    private Long authorId;
     private String authorName;
+    private Long itemId;
     private LocalDateTime created;
 }

@@ -106,7 +106,7 @@ class BaseClientErrorHandlingTest {
 
     static class TestClient extends BaseClient {
         public TestClient(RestTemplate rest, String serverUrl) {
-            super(rest, serverUrl);
+            super(rest);
         }
 
         public ResponseEntity<Object> doPost(String path, Object body) {

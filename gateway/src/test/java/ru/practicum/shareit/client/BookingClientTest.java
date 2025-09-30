@@ -31,7 +31,7 @@ class BookingClientTest {
                 .build();
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("created");
 
-        BookingClient spyClient = spy(new BookingClient(restTemplate, "http://localhost:8080"));
+        BookingClient spyClient = spy(new BookingClient(restTemplate));
         doReturn(expectedResponse).when(spyClient).post(eq("/bookings"), eq(bookingDto), eq(userId));
 
         ResponseEntity<Object> result = spyClient.createBooking(userId, bookingDto);
@@ -47,7 +47,7 @@ class BookingClientTest {
         Boolean approved = true;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("updated");
 
-        BookingClient spyClient = spy(new BookingClient(restTemplate, "http://localhost:8080"));
+        BookingClient spyClient = spy(new BookingClient(restTemplate));
         String expectedPath = "/bookings/" + bookingId + "?approved=" + approved;
         doReturn(expectedResponse).when(spyClient).patch(eq(expectedPath), isNull(), eq(userId));
 
@@ -63,7 +63,7 @@ class BookingClientTest {
         Long bookingId = 2L;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("booking");
 
-        BookingClient spyClient = spy(new BookingClient(restTemplate, "http://localhost:8080"));
+        BookingClient spyClient = spy(new BookingClient(restTemplate));
         doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(userId));
 
         ResponseEntity<Object> result = spyClient.getBooking(userId, bookingId);
@@ -80,7 +80,7 @@ class BookingClientTest {
         int size = 10;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("bookings");
 
-        BookingClient spyClient = spy(new BookingClient(restTemplate, "http://localhost:8080"));
+        BookingClient spyClient = spy(new BookingClient(restTemplate));
         doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(userId));
 
         ResponseEntity<Object> result = spyClient.getUserBookings(userId, state, from, size);
@@ -97,7 +97,7 @@ class BookingClientTest {
         int size = 10;
         ResponseEntity<Object> expectedResponse = ResponseEntity.ok("owner bookings");
 
-        BookingClient spyClient = spy(new BookingClient(restTemplate, "http://localhost:8080"));
+        BookingClient spyClient = spy(new BookingClient(restTemplate));
         doReturn(expectedResponse).when(spyClient).get(anyString(), any(), eq(userId));
 
         ResponseEntity<Object> result = spyClient.getOwnerBookings(userId, state, from, size);
@@ -109,7 +109,7 @@ class BookingClientTest {
     @Test
     void constructor_ShouldCreateClientWithCorrectServerUrl() {
         String serverUrl = "http://test-server:8080";
-        BookingClient client = new BookingClient(restTemplate, serverUrl);
+        BookingClient client = new BookingClient(restTemplate);
 
         assertNotNull(client);
     }

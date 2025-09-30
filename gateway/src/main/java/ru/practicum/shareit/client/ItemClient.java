@@ -1,16 +1,16 @@
 package ru.practicum.shareit.client;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.practicum.shareit.dto.CommentDto;
 import ru.practicum.shareit.dto.ItemDto;
 
 @Service
 public class ItemClient extends BaseClient {
 
-    public ItemClient(RestTemplate restTemplate, @Value("${shareit.server.url}") String serverUrl) {
-        super(restTemplate, serverUrl);
+    public ItemClient(RestTemplate restTemplate) {
+        super(restTemplate);
     }
 
     public ResponseEntity<Object> createItem(Long userId, ItemDto itemDto) {
@@ -39,7 +39,7 @@ public class ItemClient extends BaseClient {
         return delete("/items/" + itemId, userId);
     }
 
-    public ResponseEntity<Object> createComment(Long userId, Long itemId, Object comment) {
+    public ResponseEntity<Object> createComment(Long userId, Long itemId, CommentDto comment) {
         return post("/items/" + itemId + "/comment", comment, userId);
     }
 }
