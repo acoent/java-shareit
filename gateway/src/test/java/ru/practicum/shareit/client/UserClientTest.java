@@ -37,10 +37,10 @@ class UserClientTest {
     void createUser_shouldCallPostWithoutUserHeader() {
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
-        
+
         UserDto dto = UserDto.builder().name("u").email("u@example.com").build();
         userClient.createUser(dto);
-        
+
         verify(restTemplate).exchange(eq("/users"), eq(HttpMethod.POST), httpEntityCaptor.capture(), eq(Object.class));
         assertThat(httpEntityCaptor.getValue().getHeaders().containsKey(HeaderConstants.X_SHARER_USER_ID)).isFalse();
     }
@@ -49,10 +49,10 @@ class UserClientTest {
     void updateUser_shouldCallPatchWithCorrectPath() {
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
-        
+
         UserDto dto = UserDto.builder().name("u").email("u@example.com").build();
         userClient.updateUser(9L, dto);
-        
+
         verify(restTemplate).exchange(eq("/users/9"), eq(HttpMethod.PATCH), httpEntityCaptor.capture(), eq(Object.class));
         assertThat(httpEntityCaptor.getValue().getHeaders().getFirst(HeaderConstants.X_SHARER_USER_ID)).isEqualTo("9");
     }
@@ -61,9 +61,9 @@ class UserClientTest {
     void getUser_shouldCallGetWithCorrectPath() {
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
-        
+
         userClient.getUser(5L);
-        
+
         verify(restTemplate).exchange(eq("/users/5"), eq(HttpMethod.GET), any(HttpEntity.class), eq(Object.class));
     }
 
@@ -71,9 +71,9 @@ class UserClientTest {
     void getAllUsers_shouldCallGetWithCorrectPath() {
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
-        
+
         userClient.getAllUsers();
-        
+
         verify(restTemplate).exchange(eq("/users"), eq(HttpMethod.GET), httpEntityCaptor.capture(), eq(Object.class));
     }
 
@@ -81,9 +81,9 @@ class UserClientTest {
     void deleteUser_shouldCallDeleteWithCorrectPath() {
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
-        
+
         userClient.deleteUser(3L);
-        
+
         verify(restTemplate).exchange(eq("/users/3"), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Object.class));
     }
 

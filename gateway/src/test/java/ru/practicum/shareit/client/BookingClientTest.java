@@ -15,7 +15,8 @@ import ru.practicum.shareit.dto.BookingDto;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -58,15 +59,15 @@ class BookingClientTest {
     void createBooking_shouldSetCorrectHeaders() {
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
-        
+
         BookingDto dto = BookingDto.builder()
                 .itemId(1L)
                 .start(LocalDateTime.now().plusDays(1))
                 .end(LocalDateTime.now().plusDays(2))
                 .build();
-        
+
         bookingClient.createBooking(2L, dto);
-        
+
         verify(restTemplate).exchange(eq("/bookings"), eq(HttpMethod.POST), httpEntityCaptor.capture(), eq(Object.class));
         assertThat(httpEntityCaptor.getValue().getHeaders().getFirst(HeaderConstants.X_SHARER_USER_ID)).isEqualTo("2");
     }
@@ -92,9 +93,9 @@ class BookingClientTest {
     void updateBooking_shouldSetCorrectHeaders() {
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Object.class)))
                 .thenReturn(ResponseEntity.ok().build());
-        
+
         bookingClient.updateBooking(3L, 10L, true);
-        
+
         verify(restTemplate).exchange(contains("/bookings/10"), eq(HttpMethod.PATCH), httpEntityCaptor.capture(), eq(Object.class));
         assertThat(httpEntityCaptor.getValue().getHeaders().getFirst(HeaderConstants.X_SHARER_USER_ID)).isEqualTo("3");
     }

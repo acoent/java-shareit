@@ -12,8 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import ru.practicum.shareit.common.HeaderConstants;
 import ru.practicum.shareit.dto.ItemRequestDto;
 
-import java.time.LocalDateTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
