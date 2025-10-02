@@ -1,6 +1,8 @@
 # ShareIt
 
-ShareIt is a sharing service application that allows users to share items with others and borrow items temporarily. The service implements a simple "sharing economy" concept, enabling users to lend and borrow items without the need for purchase or hiring professionals.
+ShareIt is a sharing service application that allows users to share items with others and borrow items temporarily. The
+service implements a simple "sharing economy" concept, enabling users to lend and borrow items without the need for
+purchase or hiring professionals.
 
 ---
 
@@ -23,7 +25,9 @@ ShareIt is a sharing service application that allows users to share items with o
 
 ## Overview
 
-Imagine you bought some paintings but need a drill to hang them. Instead of buying or hiring a professional, you could borrow the drill from a friend. ShareIt provides a platform for sharing items like tools, gadgets, or rare equipment with other users. Users can:
+Imagine you bought some paintings but need a drill to hang them. Instead of buying or hiring a professional, you could
+borrow the drill from a friend. ShareIt provides a platform for sharing items like tools, gadgets, or rare equipment
+with other users. Users can:
 
 - Share their items and make them available for rent.
 - Search for items available for borrowing.
@@ -49,29 +53,30 @@ Imagine you bought some paintings but need a drill to hang them. Instead of buyi
 The main entities in the system:
 
 1. **User**
-   - Represents a user of the system.
-   - Can own items, make bookings, leave comments, and create item requests.
+    - Represents a user of the system.
+    - Can own items, make bookings, leave comments, and create item requests.
 
 2. **Item**
-   - Represents an item that can be shared.
-   - Contains `name`, `description`, `availability`, and owner information.
+    - Represents an item that can be shared.
+    - Contains `name`, `description`, `availability`, and owner information.
 
 3. **Booking**
-   - Represents a booking of an item for a specific period.
-   - Contains `start` and `end` dates, booking `status`, and booker information.
+    - Represents a booking of an item for a specific period.
+    - Contains `start` and `end` dates, booking `status`, and booker information.
 
 4. **ItemRequest**
-   - Represents a request for an item that is not currently available.
-   - Contains description of the requested item and requester information.
+    - Represents a request for an item that is not currently available.
+    - Contains description of the requested item and requester information.
 
 5. **Comment**
-   - Feedback left by a user after borrowing an item.
+    - Feedback left by a user after borrowing an item.
 
 ---
 
 ## Project Structure
 
 The project follows a **feature-based package layout**:
+
 ```
 src/main/java/ru/practicum/shareit/
 ├── booking/
@@ -105,10 +110,12 @@ src/main/java/ru/practicum/shareit/
 └── common/
     └── HeaderConstants.java
 ```
+
 markdown
 Copy code
 
-- Each feature (user, item, booking, request) has its **controller**, **service**, **repository**, **dto**, and **mapper** classes.
+- Each feature (user, item, booking, request) has its **controller**, **service**, **repository**, **dto**, and **mapper
+  ** classes.
 - `HeaderConstants` holds common HTTP header names like `X-Sharer-User-Id`.
 
 ---
@@ -118,8 +125,8 @@ Copy code
 - **DTOs (Data Transfer Objects)** are used for REST API communication.
 - **Mappers** convert between model entities and DTOs.
 - Example:
-  - `ItemMapper` converts `Item` ↔ `ItemDto`.
-  - `BookingMapper` converts `Booking` ↔ `BookingDto`.
+    - `ItemMapper` converts `Item` ↔ `ItemDto`.
+    - `BookingMapper` converts `Booking` ↔ `BookingDto`.
 
 ---
 
@@ -128,6 +135,7 @@ Copy code
 All controllers use Spring's `@RestController` and handle requests via REST endpoints:
 
 ### UserController
+
 - `POST /users` – create a user
 - `GET /users/{id}` – get user by ID
 - `GET /users` – list all users
@@ -135,6 +143,7 @@ All controllers use Spring's `@RestController` and handle requests via REST endp
 - `DELETE /users/{id}` – delete user
 
 ### ItemController
+
 - `POST /items` – add new item
 - `PATCH /items/{itemId}` – edit item
 - `GET /items/{itemId}` – get item details
@@ -143,11 +152,13 @@ All controllers use Spring's `@RestController` and handle requests via REST endp
 - `POST /items/{itemId}/comment` – add comment
 
 ### BookingController
+
 - `POST /bookings` – create booking
 - `PATCH /bookings/{bookingId}?approved=` – approve/reject booking
 - `GET /bookings/{bookingId}` – get booking by ID
 
 ### ItemRequestController
+
 - `POST /requests` – create item request
 - `GET /requests` – list requests by requester
 - `GET /requests/all` – list all requests with pagination
@@ -166,18 +177,18 @@ All controllers use Spring's `@RestController` and handle requests via REST endp
 ## Repositories
 
 - Currently in-memory storage is used:
-  - `InMemoryUserRepository`
-  - `InMemoryItemRepository`
-  - `InMemoryBookingRepository`
-  - `InMemoryItemRequestRepository`
-  - `InMemoryCommentRepository`
+    - `InMemoryUserRepository`
+    - `InMemoryItemRepository`
+    - `InMemoryBookingRepository`
+    - `InMemoryItemRequestRepository`
+    - `InMemoryCommentRepository`
 
 ---
 
 ## Validation
 
 - Bean Validation (`jakarta.validation`) is used in DTOs:
-  - `@NotNull`, `@NotBlank`, `@Positive`, etc.
+    - `@NotNull`, `@NotBlank`, `@Positive`, etc.
 - Removed unnecessary custom validators querying repositories.
 - Validations in controllers replace duplicate service checks.
 
@@ -205,6 +216,7 @@ Copy code
 ./mvnw spring-boot:run
 Use the API endpoints described in Controllers to interact with the service.
 ```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
